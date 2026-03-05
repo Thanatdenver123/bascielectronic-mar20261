@@ -15,7 +15,7 @@
     
     <style>
         body { font-family: 'Sarabun', 'Inter', sans-serif; background-color: #f0f9ff; overflow-x: hidden; }
-        .page { display: none; } /* ซ่อนไว้ก่อน ยกเว้นหน้าแรก */
+        .page { display: none; }
         
         .float-up { animation: floatUp 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards; opacity: 0; transform: translateY(50px); }
         .delay-1 { animation-delay: 0.2s; } .delay-2 { animation-delay: 0.4s; }
@@ -28,12 +28,10 @@
             background: rgba(255, 255, 255, 0.98); z-index: 9999;
             display: flex; justify-content: center; align-items: center; flex-direction: column;
             text-align: center; padding: 20px;
-            transition: opacity 0.5s ease;
         }
         .spinner { border: 4px solid #e0f2fe; border-top: 4px solid #0284c7; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* สไตล์พิเศษสำหรับหน้าจอหลักให้ดูเด่นขึ้น */
         #page-home { display: flex; } 
     </style>
 </head>
@@ -45,15 +43,15 @@
         <div id="loading-overlay">
             <div class="spinner mb-6"></div>
             <h2 class="text-sky-700 font-bold text-2xl mb-2">Basic Electronics</h2>
-            <div id="loading-log" class="text-sm text-gray-500 mb-6 font-mono h-6">กำลังเชื่อมต่อฐานข้อมูล...</div>
+            <div id="loading-log" class="text-sm text-gray-500 mb-6 font-mono h-6">กำลังเริ่มต้นระบบ...</div>
             <div id="diagnostic-box" class="hidden bg-amber-50 border border-amber-200 text-amber-700 p-4 rounded-xl text-sm max-w-md mb-4 text-left">
                 <p class="font-bold mb-1"><i class="fa-solid fa-circle-exclamation mr-2"></i>ตรวจพบปัญหา:</p>
                 <p id="diagnostic-text" class="font-mono text-xs break-words"></p>
             </div>
-            <button onclick="hideLoadingForce()" class="text-sky-500 underline text-xs mt-4">ข้ามการโหลด (หากรอนานเกินไป)</button>
+            <button onclick="hideLoadingForce()" class="text-sky-500 underline text-xs mt-4">ข้ามการโหลด (Force Skip)</button>
         </div>
 
-        <!-- 1. Landing Page (Set to Flex initially) -->
+        <!-- 1. Landing Page -->
         <div id="page-home" class="page w-full min-h-screen relative overflow-hidden bg-gradient-to-br from-sky-100 via-white to-blue-50 flex items-center justify-center">
             <i class="fa-solid fa-microchip text-blue-100 text-9xl absolute bottom-20 right-10 floating-bg" style="animation-delay: 1s;"></i>
             <i class="fa-solid fa-bolt text-yellow-100 text-8xl absolute top-40 left-40 floating-bg opacity-50" style="animation-delay: 2s;"></i>
@@ -71,10 +69,10 @@
                 </div>
                 <div class="flex flex-col sm:flex-row gap-6 justify-center items-center float-up delay-2 mt-8">
                     <button id="btn-go-teacher" class="group relative bg-white text-sky-700 px-10 py-4 rounded-full font-bold text-xl shadow-lg hover:shadow-xl transition-all border-2 border-sky-100">
-                        <span><i class="fa-solid fa-chalkboard-user mr-2"></i> ครู</span>
+                        <span><i class="fa-solid fa-chalkboard-user mr-2"></i> เข้าสู่ระบบครู</span>
                     </button>
                     <button id="btn-go-student" class="group relative bg-sky-600 text-white px-10 py-4 rounded-full font-bold text-xl shadow-lg hover:shadow-xl hover:bg-sky-700 transition-all border-2 border-transparent">
-                        <span><i class="fa-solid fa-user-graduate mr-2"></i> พนักงาน</span>
+                        <span><i class="fa-solid fa-user-graduate mr-2"></i> เข้าสู่ระบบพนักงาน</span>
                     </button>
                 </div>
             </div>
@@ -85,28 +83,35 @@
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-sky-100 flex flex-wrap justify-between items-center gap-4 mb-6">
                 <div class="flex items-center gap-4">
                     <div class="bg-sky-100 p-3 rounded-xl text-sky-600"><i class="fa-solid fa-chart-pie text-2xl"></i></div>
-                    <div><h2 class="text-2xl font-bold text-slate-800">Monitor Room</h2><p class="text-slate-500 text-sm">พนักงาน: <span id="student-count" class="font-bold text-sky-600">0</span> คน</p></div>
+                    <div><h2 class="text-2xl font-bold text-slate-800">Monitor Room</h2><p class="text-slate-500 text-sm">ผู้เข้าสอบ: <span id="student-count" class="font-bold text-sky-600">0</span> คน</p></div>
                 </div>
                 <div class="flex gap-3">
                      <button id="btn-toggle-system" class="px-6 py-2.5 rounded-xl text-white font-bold shadow-md transition bg-gray-400">
-                        <i class="fa-solid fa-power-off"></i> <span id="txt-system-status">Checking...</span>
+                        <i class="fa-solid fa-power-off"></i> <span id="txt-system-status">กำลังตรวจสอบ...</span>
+                    </button>
+                    <button id="btn-dl-excel" class="bg-emerald-500 text-white px-6 py-2.5 rounded-xl hover:bg-emerald-600 transition font-bold shadow-md flex items-center gap-2">
+                        <i class="fa-solid fa-file-excel"></i> Export
                     </button>
                     <button onclick="location.reload()" class="px-4 py-2.5 rounded-xl bg-slate-100 text-slate-600 font-bold transition"><i class="fa-solid fa-sign-out-alt"></i></button>
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm border border-sky-100 overflow-hidden h-[600px]">
+            <div class="bg-white rounded-2xl shadow-sm border border-sky-100 overflow-hidden h-[600px] flex flex-col">
                 <div class="p-4 border-b border-slate-100 bg-slate-50 font-bold text-slate-600 flex justify-between items-center">
-                    <span>ตารางคะแนนรวม</span>
+                    <span>ตารางคะแนนและสถานะเรียลไทม์</span>
                     <div class="flex gap-4">
-                         <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" id="toggle-names" checked> ชื่อ</label>
-                         <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" id="toggle-answers"> เฉลย</label>
+                         <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" id="toggle-names" checked class="accent-sky-600"> แสดงชื่อ</label>
+                         <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" id="toggle-answers" class="accent-green-600"> แสดงเฉลย</label>
                     </div>
                 </div>
                 <div class="flex-1 overflow-auto">
                     <table class="w-full text-left border-collapse min-w-[2000px]">
-                        <thead class="bg-white sticky top-0 z-10 text-xs uppercase text-slate-500 shadow-sm"><tr id="grid-header-row"></tr></thead>
-                        <tbody id="grid-body" class="text-sm divide-y divide-slate-50"></tbody>
+                        <thead class="bg-white sticky top-0 z-10 text-xs uppercase text-slate-500 shadow-sm border-b">
+                            <tr id="grid-header-row"></tr>
+                        </thead>
+                        <tbody id="grid-body" class="text-sm divide-y divide-slate-50">
+                            <tr><td colspan="50" class="p-10 text-center text-slate-400">กำลังดึงข้อมูล...</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -119,13 +124,13 @@
                 <p class="text-slate-400 text-sm">กรุณากรอกรหัสประจำตัวพนักงาน</p>
             </div>
             <div class="space-y-5">
-                <input type="text" id="student-id" class="w-full px-4 py-3.5 border-2 border-slate-100 rounded-xl text-center text-xl font-bold" placeholder="รหัสพนักงาน">
-                <div id="student-preview" class="hidden bg-green-50 p-4 rounded-xl text-center border border-green-100">
+                <input type="text" id="student-id" class="w-full px-4 py-3.5 border-2 border-slate-100 rounded-xl text-center text-xl font-bold tracking-widest focus:border-sky-500 outline-none transition" placeholder="รหัสพนักงาน">
+                <div id="student-preview" class="hidden bg-green-50 p-4 rounded-xl text-center border border-green-100 animate-pulse">
                     <p class="font-bold text-green-800 text-lg" id="preview-name"></p>
                     <p class="text-sm text-green-600" id="preview-dept"></p>
                 </div>
-                <button id="btn-student-login" class="w-full bg-sky-600 text-white px-4 py-4 rounded-xl font-bold text-lg hover:bg-sky-700 transition">เริ่มทำข้อสอบ</button>
-                <button onclick="location.reload()" class="w-full text-slate-400 text-sm">ยกเลิก</button>
+                <button id="btn-student-login" class="w-full bg-sky-600 text-white px-4 py-4 rounded-xl font-bold text-lg hover:bg-sky-700 transition shadow-lg">เริ่มทำข้อสอบ</button>
+                <button onclick="location.reload()" class="w-full text-slate-400 text-sm hover:underline">ยกเลิก</button>
             </div>
         </div>
 
@@ -143,31 +148,34 @@
                 <div id="question-card" class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
                     <h3 class="text-xl md:text-2xl font-medium text-slate-800 mb-6 leading-relaxed" id="question-text">...</h3>
                     <div id="question-image-container" class="mb-6 hidden flex justify-center">
-                        <img id="question-image" src="" alt="Component" class="max-h-60 rounded-lg shadow-md">
+                        <img id="question-image" src="" alt="Component" class="max-h-60 rounded-lg shadow-md border">
                     </div>
                     <div id="options-container" class="space-y-4"></div>
                 </div>
             </div>
             <div class="p-5 bg-white border-t border-slate-100 flex justify-between items-center">
-                <button id="btn-prev" class="px-6 py-3 rounded-xl font-bold text-slate-500" disabled>ย้อนกลับ</button>
-                <button id="btn-next" class="px-8 py-3 rounded-xl font-bold bg-sky-600 text-white">ข้อถัดไป</button>
-                <button id="btn-submit" class="hidden px-8 py-3 rounded-xl font-bold bg-green-600 text-white">ส่งคำตอบ</button>
+                <button id="btn-prev" class="px-6 py-3 rounded-xl font-bold text-slate-400 hover:bg-slate-50 transition" disabled><i class="fa-solid fa-arrow-left mr-2"></i> ย้อนกลับ</button>
+                <button id="btn-next" class="px-8 py-3 rounded-xl font-bold bg-sky-600 text-white hover:bg-sky-700 transition shadow-md">ข้อถัดไป <i class="fa-solid fa-arrow-right ml-2"></i></button>
+                <button id="btn-submit" class="hidden px-8 py-3 rounded-xl font-bold bg-green-600 text-white hover:bg-green-700 transition shadow-md">ส่งคำตอบ <i class="fa-solid fa-check-circle ml-2"></i></button>
             </div>
         </div>
 
         <!-- 5. Submitted -->
-        <div id="page-submitted" class="page m-auto bg-white p-12 rounded-3xl shadow-2xl text-center max-w-lg mt-10">
+        <div id="page-submitted" class="page m-auto bg-white p-12 rounded-3xl shadow-2xl text-center max-w-lg mt-10 border-4 border-green-50">
             <div id="submit-emoji" class="mb-6 text-8xl">🎉</div>
             <h2 id="submit-title" class="text-3xl font-black text-slate-800 mb-2">ส่งคำตอบเรียบร้อย!</h2>
-            <p id="submit-message" class="text-slate-500 text-lg mb-8">ขอบคุณที่ร่วมทำแบบทดสอบ</p>
-            <button onclick="location.reload()" class="bg-slate-100 text-slate-600 px-8 py-3 rounded-full font-bold">กลับหน้าแรก</button>
+            <p id="submit-message" class="text-slate-500 text-lg mb-8">ข้อมูลของคุณถูกบันทึกเข้าระบบแล้ว</p>
+            <button onclick="location.reload()" class="bg-slate-100 text-slate-600 px-8 py-3 rounded-full font-bold hover:bg-slate-200 transition">กลับหน้าแรก</button>
         </div>
 
         <!-- 6. Teacher Login -->
         <div id="page-teacher-login" class="page bg-white p-8 rounded-2xl shadow-xl max-w-md mx-auto mt-10">
             <h2 class="text-2xl font-bold text-center text-sky-700 mb-6">สำหรับครู</h2>
-            <input type="password" id="teacher-room-code" class="w-full px-4 py-2 border rounded-md mb-4" placeholder="รหัสห้อง...">
-            <button id="btn-teacher-login" class="w-full bg-sky-600 text-white px-4 py-2 rounded-md font-semibold">เข้าสู่ระบบ</button>
+            <div class="space-y-4">
+                <input type="password" id="teacher-room-code" class="w-full px-4 py-3 border rounded-xl outline-none focus:border-sky-500 transition text-center" placeholder="กรอกรหัสผ่าน">
+                <button id="btn-teacher-login" class="w-full bg-sky-600 text-white px-4 py-4 rounded-xl font-bold hover:bg-sky-700 transition shadow-lg">เข้าสู่ระบบ Dashboard</button>
+                <button onclick="location.reload()" class="w-full text-slate-400 text-sm">กลับหน้าหลัก</button>
+            </div>
         </div>
     </div>
 
@@ -185,10 +193,9 @@
             appId: "1:50383344070:web:5003afe4c5530fc1d5a2c7"
         };
 
-        const SHEET_URL = "https://docs.google.com/spreadsheets/d/1B1jOH7V3wtvdOTlL7BvwEHRpSIto1DIDwdT_n_P1SNc/gviz/tq?tqx=out:csv&gid=0";
+        const SHEET_URL = "https://docs.google.com/spreadsheets/d/1B1jOH7V3wtvdOTlL7BvwEHRpSIto1DIDwdT_n_P1SNc/export?format=csv&gid=0";
         const TEACHER_CODE = "basic";
         
-        // ข้อมูลคำถาม 40 ข้อ (ย่อไว้เพื่อความรัดกุม)
         const MASTER_QUESTIONS = [
             { t: "อุปกรณ์ที่มีหน้าที่จำกัดการไหลของกระแสไฟฟ้าในวงจร คือ", opts: ["ขดลวด", "ตัวเก็บประจุ", "ตัวต้านทาน", "หม้อแปลง"], a: 2 },
             { t: "อุปกรณ์อิเล็กทรอนิกส์ชนิดใด ที่ทำหน้าที่คล้ายกับแหล่งจ่ายไฟฟ้าในวงจร สามารถเก็บ หรือ คายประจุได้", opts: ["ตัวต้านทาน", "ตัวเก็บประจุ", "ตัวเหนี่ยวนำ", "หม้อแปลง"], a: 1 },
@@ -241,8 +248,11 @@
             setTimeout(() => { document.getElementById('loading-overlay').style.display = 'none'; }, 500);
         };
 
+        function updateLog(msg) { document.getElementById('loading-log').innerText = msg; }
+
         async function init() {
             try {
+                updateLog("กำลังเชื่อมต่อฐานข้อมูล...");
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
@@ -256,7 +266,7 @@
                     } else {
                         signInAnonymously(auth).catch(e => {
                             document.getElementById('diagnostic-box').classList.remove('hidden');
-                            document.getElementById('diagnostic-text').innerText = "Auth Error: " + e.message;
+                            document.getElementById('diagnostic-text').innerText = "Firebase Auth Error: " + e.message;
                         });
                     }
                 });
@@ -273,32 +283,104 @@
             else el.style.display = 'block';
         };
 
-        // UI Event Listeners
-        document.getElementById('btn-go-teacher').onclick = () => show('page-teacher-login');
-        document.getElementById('btn-go-student').onclick = () => show('page-student-login');
+        // --- TEACHER LOGIC ---
+        function initTeacherDashboard() {
+            const thead = document.querySelector('thead #grid-header-row');
+            thead.innerHTML = `<th class="p-3 border-b w-12 text-center bg-slate-50 sticky left-0 z-20">#</th><th class="p-3 border-b w-24 text-center bg-slate-50 sticky left-12 z-20">รหัส</th><th class="p-3 border-b min-w-[200px] bg-slate-50 sticky left-[144px] z-20 border-r">ชื่อ-สกุล</th><th class="p-3 border-b w-24 text-center bg-slate-50">สถานะ</th><th class="p-3 border-b w-20 text-center bg-slate-50 text-sky-700 font-bold">%</th>`;
+            MASTER_QUESTIONS.forEach((_, i) => {
+                const th = document.createElement('th');
+                th.className = "p-2 border-b text-center w-12 font-bold text-slate-400 text-xs";
+                th.innerText = i + 1; thead.appendChild(th);
+            });
 
-        document.getElementById('btn-teacher-login').onclick = () => {
-            if(document.getElementById('teacher-room-code').value === TEACHER_CODE) {
-                show('page-teacher-dashboard'); initTeacherDashboard();
-            } else alert("รหัสผิด");
-        };
+            onSnapshot(configRef, (snap) => {
+                const isOpen = snap.exists() ? snap.data().isOpen : false;
+                const btn = document.getElementById('btn-toggle-system');
+                btn.innerHTML = isOpen ? `<i class="fa-solid fa-pause"></i> ปิดระบบ` : `<i class="fa-solid fa-play"></i> เปิดระบบ`;
+                btn.className = isOpen ? "px-6 py-2.5 rounded-xl text-white font-bold shadow-md bg-amber-500 transition" : "px-6 py-2.5 rounded-xl text-white font-bold shadow-md bg-emerald-500 transition";
+                btn.onclick = async () => await updateDoc(configRef, { isOpen: !isOpen });
+                document.getElementById('txt-system-status').innerText = isOpen ? 'ระบบเปิดรับคำตอบ' : 'ระบบปิดอยู่';
+            });
 
-        function updateLog(msg) { document.getElementById('loading-log').innerText = msg; }
+            onSnapshot(query(studentsRef), (snap) => {
+                allResults = []; 
+                snap.forEach(d => allResults.push(d.data()));
+                renderGrid();
+            }, (error) => {
+                console.error("Snapshot error:", error);
+                document.getElementById('grid-body').innerHTML = `<tr><td colspan="50" class="p-10 text-center text-red-500">Error: ไม่สามารถโหลดข้อมูลได้ (${error.message})</td></tr>`;
+            });
+            
+            document.getElementById('toggle-answers').onchange = () => renderGrid();
+            document.getElementById('toggle-names').onchange = () => renderGrid();
+        }
 
-        // ส่วนฟังก์ชันอื่นๆ (Dashboard, Exam logic) คงเดิมเหมือนเวอร์ชันก่อนหน้า
-        // ... (ระบบ Exam และ Dashboard)
+        function renderGrid() {
+            const showNames = document.getElementById('toggle-names').checked;
+            const showAnswers = document.getElementById('toggle-answers').checked;
+            const tbody = document.getElementById('grid-body'); 
+            tbody.innerHTML = '';
+            document.getElementById('student-count').innerText = allResults.length;
+            
+            if(allResults.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="50" class="p-10 text-center text-slate-400 font-medium">ไม่มีข้อมูลผู้เข้าสอบในขณะนี้</td></tr>`;
+                return;
+            }
 
-        // เรียกใช้งาน Init
-        window.onload = () => { init(); };
+            allResults.sort((a,b) => (b.status === 'submitted' ? 1 : 0) - (a.status === 'submitted' ? 1 : 0));
+            
+            allResults.forEach((s, i) => {
+                const tr = document.createElement('tr'); 
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-50 group";
+                
+                let cellsHtml = `
+                    <td class="p-3 text-center text-slate-400 text-xs sticky left-0 bg-white group-hover:bg-slate-50 z-10">${i+1}</td>
+                    <td class="p-3 text-center text-slate-600 font-mono text-xs sticky left-12 bg-white group-hover:bg-slate-50 z-10">${s.studentId}</td>
+                    <td class="p-3 whitespace-nowrap sticky left-[144px] bg-white group-hover:bg-slate-50 z-10 border-r">
+                        <div class="text-slate-700 font-medium text-sm">${showNames ? s.name : '*** (ซ่อนชื่อ)'}</div>
+                        <div class="text-[10px] text-slate-400">${s.dept || '-'}</div>
+                    </td>
+                    <td class="p-3 text-center">
+                        ${s.status === 'submitted' ? '<span class="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700 text-[10px] font-bold">ส่งแล้ว</span>' : '<span class="px-2 py-0.5 rounded-md bg-sky-100 text-sky-700 text-[10px] font-bold">กำลังทำ</span>'}
+                    </td>
+                    <td class="p-3 text-center font-bold text-slate-700 text-sm">
+                        ${s.score !== null ? Math.round(s.score)+'%' : '-'}
+                    </td>
+                `;
 
-        // ฟังก์ชันช่วยดึงรายชื่อ (fetchStudents) พร้อม Error handling
+                s.answers.forEach((ansIdx, idx) => {
+                    let cellCls = "w-6 h-6 rounded mx-auto flex items-center justify-center text-[10px] font-bold ";
+                    let txt = (ansIdx === null) ? "•" : "";
+                    
+                    if (ansIdx !== null) { 
+                        if(showAnswers) { 
+                            const isCorrect = (ansIdx === MASTER_QUESTIONS[idx].a); 
+                            cellCls += isCorrect ? "bg-emerald-500 text-white" : "bg-red-500 text-white"; 
+                            txt = isCorrect ? "✓" : "✕"; 
+                        } else {
+                            cellCls += "bg-sky-500 text-white";
+                            txt = "A"; // placeholder
+                        }
+                    } else {
+                        cellCls += "bg-slate-100 text-slate-300";
+                    }
+                    cellsHtml += `<td class="p-1"><div class="${cellCls}">${txt}</div></td>`;
+                });
+                
+                tr.innerHTML = cellsHtml;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- STUDENT LOGIC ---
         async function fetchStudents() { 
             if (studentCache) return studentCache;
             if (isFetching) return [];
             isFetching = true;
             try {
+                updateLog("กำลังดึงรายชื่อพนักงาน...");
                 const res = await fetch(SHEET_URL); 
-                if (!res.ok) throw new Error("ไม่สามารถเข้าถึง Google Sheets ได้");
+                if (!res.ok) throw new Error("เข้าถึงไฟล์รายชื่อไม่ได้ (HTTP Error)");
                 const csv = await res.text(); 
                 return new Promise((resolve) => {
                     Papa.parse(csv, {
@@ -306,83 +388,167 @@
                         complete: (results) => {
                             studentCache = results.data;
                             isFetching = false;
+                            updateLog("พร้อมใช้งาน");
                             resolve(results.data);
                         }
                     });
                 });
             } catch (err) {
                 isFetching = false;
-                alert("เกิดข้อผิดพลาดในการโหลดรายชื่อพนักงาน: " + err.message);
+                console.error("Fetch error:", err);
                 return [];
             }
         }
 
-        // Student Login Logic
+        // Student Search
+        document.getElementById('student-id').addEventListener('input', async (e) => { 
+            const id = e.target.value.trim(); 
+            if (id.length < 3) {
+                document.getElementById('student-preview').classList.add('hidden');
+                return;
+            }
+            const list = await fetchStudents(); 
+            const s = list.find(x => x['รหัสประจำตัว'] == id); 
+            if (s) { 
+                document.getElementById('preview-name').innerText = (s['ชื่อ'] || "") + " " + (s['นามสกุล'] || ""); 
+                document.getElementById('preview-dept').innerText = s['แผนก'] || ""; 
+                document.getElementById('student-preview').classList.remove('hidden'); 
+            } else {
+                document.getElementById('student-preview').classList.add('hidden'); 
+            }
+        });
+
         document.getElementById('btn-student-login').onclick = async () => {
             const id = document.getElementById('student-id').value.trim();
             if (!id) return alert("กรุณากรอกรหัสพนักงาน");
+            
             const conf = await getDoc(configRef); 
-            if (!conf.exists() || !conf.data().isOpen) return alert("ระบบยังไม่เปิด");
+            if (!conf.exists() || !conf.data().isOpen) return alert("❌ ระบบปิดรับคำตอบในขณะนี้");
 
             const list = await fetchStudents(); 
             const s = list.find(x => x['รหัสประจำตัว'] == id); 
-            if (!s) return alert("ไม่พบข้อมูลรหัสพนักงานนี้");
+            if (!s) return alert("❌ ไม่พบข้อมูลรหัสพนักงานนี้ในระบบ");
 
-            currentStudent = { id: s['รหัสประจำตัว'], name: s['ชื่อ']+" "+s['นามสกุล'], dept: s['แผนก'], startTime: Date.now() };
-            document.getElementById('exam-student-name').innerText = currentStudent.name;
-            document.getElementById('exam-student-dept').innerText = currentStudent.dept;
+            currentStudent = { id: s['รหัสประจำตัว'], name: (s['ชื่อ'] || "") + " " + (s['นามสกุล'] || ""), dept: s['แผนก'] || "", startTime: Date.now() };
             
-            // สุ่มข้อสอบและไปหน้าสอบ
-            studentQuestions = MASTER_QUESTIONS.sort(() => Math.random() - 0.5).map((q, i) => ({...q, originalIndex: i}));
-            studentOptionOrders = {}; 
-            studentQuestions.forEach(q => studentOptionOrders[q.originalIndex] = [0,1,2,3].sort(() => Math.random() - 0.5));
-            
-            renderQuestion();
-            show('page-student-exam');
+            try {
+                const existing = await getDoc(doc(studentsRef, currentStudent.id));
+                if (existing.exists() && existing.data().status === 'submitted') return alert("⚠️ คุณได้ทำการส่งคำตอบไปแล้ว ไม่สามารถสอบซ้ำได้");
+                
+                if (!existing.exists()) { 
+                    await setDoc(doc(studentsRef, currentStudent.id), { 
+                        studentId: currentStudent.id, name: currentStudent.name, dept: currentStudent.dept, 
+                        status: 'online', score: null, answers: new Array(40).fill(null) 
+                    }); 
+                } else {
+                    const saved = existing.data().answers;
+                    saved.forEach((v, idx) => { if(v !== null) studentAnswersMap[idx] = v; });
+                }
+
+                // สุ่มคำถาม
+                studentQuestions = MASTER_QUESTIONS.map((q, i) => ({...q, originalIndex: i})).sort(() => Math.random() - 0.5);
+                studentOptionOrders = {}; 
+                studentQuestions.forEach(q => studentOptionOrders[q.originalIndex] = [0,1,2,3].sort(() => Math.random() - 0.5));
+                
+                document.getElementById('exam-student-name').innerText = currentStudent.name;
+                document.getElementById('exam-student-dept').innerText = currentStudent.dept;
+                renderQuestion();
+                show('page-student-exam');
+            } catch(e) {
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล: " + e.message);
+            }
         };
 
         function renderQuestion() {
             const q = studentQuestions[currentQIndex];
             document.getElementById('q-current').innerText = currentQIndex + 1;
             document.getElementById('question-text').innerText = q.t;
+            document.getElementById('progress-bar').style.width = `${((currentQIndex + 1) / 40) * 100}%`;
+            
             const imgContainer = document.getElementById('question-image-container');
             if (q.img) {
                 imgContainer.classList.remove('hidden');
                 document.getElementById('question-image').src = q.img;
+                document.getElementById('question-image').onerror = () => imgContainer.classList.add('hidden');
             } else imgContainer.classList.add('hidden');
             
             const optsContainer = document.getElementById('options-container');
             optsContainer.innerHTML = '';
             studentOptionOrders[q.originalIndex].forEach((origIdx, i) => {
                 const isSelected = studentAnswersMap[q.originalIndex] === origIdx;
-                optsContainer.innerHTML += `<div onclick="window.selectAnswer(${origIdx})" class="p-4 border-2 rounded-xl cursor-pointer ${isSelected ? 'border-sky-500 bg-sky-50' : 'border-slate-100'}">
-                    ${String.fromCharCode(65 + i)}. ${q.opts[origIdx]}
-                </div>`;
+                optsContainer.innerHTML += `
+                    <div onclick="window.selectAnswer(${origIdx})" class="p-5 border-2 rounded-xl cursor-pointer flex items-center gap-4 transition-all ${isSelected ? 'border-sky-500 bg-sky-50 ring-2 ring-sky-100' : 'border-slate-100 hover:bg-slate-50'}">
+                        <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm ${isSelected ? 'bg-sky-500 border-sky-500 text-white' : 'border-slate-300 text-slate-400'}">
+                            ${String.fromCharCode(65 + i)}
+                        </div>
+                        <span class="text-lg font-medium text-slate-700">${q.opts[origIdx]}</span>
+                    </div>`;
             });
+
+            document.getElementById('btn-prev').disabled = currentQIndex === 0;
+            document.getElementById('btn-next').classList.toggle('hidden', currentQIndex === 39);
+            document.getElementById('btn-submit').classList.toggle('hidden', currentQIndex !== 39);
         }
 
-        window.selectAnswer = (val) => {
+        window.selectAnswer = async (val) => {
             const q = studentQuestions[currentQIndex];
             studentAnswersMap[q.originalIndex] = val;
             renderQuestion();
+            const arr = new Array(40).fill(null);
+            Object.keys(studentAnswersMap).forEach(k => arr[k] = studentAnswersMap[k]);
+            await updateDoc(doc(studentsRef, currentStudent.id), { answers: arr });
         };
 
         document.getElementById('btn-next').onclick = () => {
-            if(currentQIndex < 39) { currentQIndex++; renderQuestion(); }
-            if(currentQIndex === 39) { 
-                document.getElementById('btn-next').classList.add('hidden');
-                document.getElementById('btn-submit').classList.remove('hidden');
-            }
+            if (studentAnswersMap[studentQuestions[currentQIndex].originalIndex] === undefined) return alert("กรุณาเลือกคำตอบก่อนไปข้อถัดไป");
+            if (currentQIndex < 39) { currentQIndex++; renderQuestion(); }
         };
 
-        // Dashboard Mock (ย่อ)
-        function initTeacherDashboard() {
-            onSnapshot(query(studentsRef), (snap) => {
-                allResults = []; snap.forEach(d => allResults.push(d.data()));
-                document.getElementById('student-count').innerText = allResults.length;
-            });
-        }
+        document.getElementById('btn-prev').onclick = () => {
+            if (currentQIndex > 0) { currentQIndex--; renderQuestion(); }
+        };
 
+        document.getElementById('btn-submit').onclick = async () => {
+            if (studentAnswersMap[studentQuestions[currentQIndex].originalIndex] === undefined) return alert("กรุณาเลือกคำตอบข้อสุดท้าย");
+            if (!confirm("ยืนยันการส่งคำตอบ? เมื่อส่งแล้วจะไม่สามารถแก้ไขได้")) return;
+            
+            let correct = 0;
+            MASTER_QUESTIONS.forEach((q, i) => { if(studentAnswersMap[i] === q.a) correct++; });
+            const score = (correct / 40) * 100;
+            
+            try {
+                updateLog("กำลังส่งคำตอบ...");
+                await updateDoc(doc(studentsRef, currentStudent.id), { 
+                    status: 'submitted', 
+                    score: score,
+                    timeTaken: (Date.now() - currentStudent.startTime) / 1000
+                });
+                show('page-submitted');
+            } catch(e) { alert("ส่งไม่สำเร็จ: " + e.message); }
+        };
+
+        document.getElementById('btn-dl-excel').onclick = () => {
+            const data = allResults.map((s, i) => {
+                const row = { "ลำดับ": i+1, "รหัส": s.studentId, "ชื่อ": s.name, "คะแนน(%)": s.score };
+                s.answers.forEach((ans, idx) => {
+                    row[`ข้อ ${idx+1}`] = (ans === MASTER_QUESTIONS[idx].a) ? "ถูก" : "ผิด/ไม่ตอบ";
+                });
+                return row;
+            });
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Results");
+            XLSX.writeFile(wb, "Exam_Results.xlsx");
+        };
+
+        document.getElementById('btn-teacher-login').onclick = () => {
+            if(document.getElementById('teacher-room-code').value === TEACHER_CODE) {
+                show('page-teacher-dashboard'); 
+                initTeacherDashboard();
+            } else alert("รหัสผ่านไม่ถูกต้อง");
+        };
+
+        window.onload = () => { init(); };
     </script>
 </body>
 </html>
