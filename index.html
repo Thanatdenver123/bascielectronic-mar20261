@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basic Electronics - Exam System</title>
+    <title>Basic Electronics - Exam System v11.5</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -45,7 +45,6 @@
                 <p class="font-bold mb-1">สถานะระบบ:</p>
                 <p id="diagnostic-text" class="font-mono whitespace-pre-wrap"></p>
             </div>
-            <button id="btn-force-skip" class="text-sky-500 underline text-xs mt-4">ข้ามการโหลด (Force Skip)</button>
         </div>
 
         <!-- 1. Landing Page -->
@@ -71,34 +70,70 @@
 
         <!-- 2. Teacher Dashboard -->
         <div id="page-teacher-dashboard" class="page w-full max-w-[95%] mx-auto pt-6 px-4 pb-12">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-sky-100 flex flex-wrap justify-between items-center gap-4 mb-6">
+            <!-- Header & System Controls -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-sky-100 flex flex-wrap justify-between items-start gap-4 mb-6">
                 <div class="flex items-center gap-4">
                     <div class="bg-sky-100 p-3 rounded-xl text-sky-600"><i class="fa-solid fa-chart-pie text-2xl"></i></div>
-                    <div><h2 class="text-2xl font-bold text-slate-800">Monitor Room</h2><p class="text-slate-500 text-sm">ผู้เข้าสอบ: <span id="student-count" class="font-bold text-sky-600">0</span> คน</p></div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800">Monitor Room</h2>
+                        <p class="text-slate-500 text-sm">พนักงานทั้งหมด: <span id="student-count" class="font-bold text-sky-600">0</span> คน</p>
+                    </div>
                 </div>
-                <div class="flex gap-3">
-                    <button id="btn-toggle-system" class="px-6 py-2.5 rounded-xl text-white font-bold shadow-md transition bg-gray-400">
-                        <i class="fa-solid fa-power-off"></i> <span id="txt-system-status">...</span>
+                
+                <div class="flex flex-wrap gap-4 items-center bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <!-- Toggle System -->
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase">สถานะรับคำตอบ</label>
+                        <button id="btn-toggle-system" class="px-4 py-2 rounded-lg text-white font-bold text-sm shadow-md transition bg-gray-400">
+                            <span id="txt-system-status">Checking...</span>
+                        </button>
+                    </div>
+                    <!-- Toggle Shuffle -->
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase">การสุ่มคำถาม</label>
+                        <button id="btn-toggle-shuffle" class="px-4 py-2 rounded-lg text-white font-bold text-sm shadow-md transition bg-indigo-500 hover:bg-indigo-600">
+                            <span id="txt-shuffle-status">สุ่มข้อสอบ</span>
+                        </button>
+                    </div>
+                    <!-- Pass Score Setting -->
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase">เกณฑ์การผ่าน (%)</label>
+                        <select id="select-pass-mark" class="px-3 py-2 rounded-lg border border-slate-200 text-sm font-bold outline-none focus:border-sky-500">
+                            <option value="60">60%</option>
+                            <option value="70">70%</option>
+                            <option value="80">80%</option>
+                            <option value="90">90%</option>
+                            <option value="100">100%</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <button id="btn-dl-excel" class="bg-emerald-500 text-white px-4 py-2.5 rounded-xl hover:bg-emerald-600 transition font-bold shadow-md flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-file-excel"></i> Export Excel
                     </button>
-                    <button id="btn-dl-excel" class="bg-emerald-500 text-white px-6 py-2.5 rounded-xl hover:bg-emerald-600 font-bold shadow-md"><i class="fa-solid fa-file-excel mr-1"></i> Export</button>
-                    <button onclick="location.reload()" class="px-4 py-2.5 rounded-xl bg-slate-100 text-slate-600 font-bold"><i class="fa-solid fa-sign-out-alt"></i></button>
+                    <button id="btn-clear-db" class="bg-red-500 text-white px-4 py-2.5 rounded-xl hover:bg-red-600 transition font-bold shadow-md flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-trash"></i> ล้างระบบ
+                    </button>
+                    <button onclick="location.reload()" class="px-3 py-2.5 rounded-xl bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition"><i class="fa-solid fa-rotate"></i></button>
                 </div>
             </div>
 
             <div class="bg-white rounded-2xl shadow-sm border border-sky-100 overflow-hidden h-[600px] flex flex-col">
-                <div class="p-4 border-b bg-slate-50 font-bold text-slate-600 flex justify-between items-center">
-                    <span>ตารางคะแนนเรียลไทม์</span>
+                <div class="p-4 border-b bg-slate-50 font-bold text-slate-600 flex justify-between items-center text-sm">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-list-check"></i> ตารางคะแนน (เรียงตามคะแนนและเวลา)</span>
                     <div class="flex gap-4">
-                        <label class="flex items-center gap-2 text-xs"><input type="checkbox" id="toggle-names" checked> ชื่อ</label>
-                        <label class="flex items-center gap-2 text-xs"><input type="checkbox" id="toggle-answers"> เฉลย</label>
+                         <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="toggle-names" checked class="accent-sky-600"> ชื่อ</label>
+                         <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="toggle-answers" class="accent-green-600"> เฉลย</label>
                     </div>
                 </div>
                 <div class="flex-1 overflow-auto">
-                    <table class="w-full text-left border-collapse min-w-[2000px]">
-                        <thead class="bg-white sticky top-0 z-10 text-xs uppercase text-slate-500 border-b">
+                    <table class="w-full text-left border-collapse min-w-[2200px]">
+                        <thead class="bg-white sticky top-0 z-10 text-[10px] uppercase text-slate-500 shadow-sm border-b">
                             <tr id="grid-header-row"></tr>
                         </thead>
-                        <tbody id="grid-body" class="text-sm divide-y divide-slate-50"></tbody>
+                        <tbody id="grid-body" class="text-sm divide-y divide-slate-50">
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -108,58 +143,62 @@
         <div id="page-student-login" class="page m-auto bg-white p-8 rounded-2xl shadow-xl max-w-md w-full mt-10 border border-sky-50">
             <div class="text-center mb-8">
                 <h2 class="text-2xl font-bold text-slate-800">เข้าห้องสอบ</h2>
-                <p class="text-slate-400 text-sm">กรอกรหัสประจำตัวพนักงาน</p>
+                <p class="text-slate-400 text-sm">กรุณากรอกรหัสประจำตัวพนักงาน</p>
             </div>
             <div class="space-y-5">
-                <input type="text" id="student-id" class="w-full px-4 py-3.5 border-2 border-slate-100 rounded-xl text-center text-xl font-bold focus:border-sky-500 outline-none" placeholder="รหัสพนักงาน">
+                <input type="text" id="student-id" class="w-full px-4 py-3.5 border-2 border-slate-100 rounded-xl text-center text-xl font-bold tracking-widest focus:border-sky-500 outline-none transition" placeholder="รหัสพนักงาน">
                 <div id="student-preview" class="hidden bg-green-50 p-4 rounded-xl text-center border border-green-100">
                     <p class="font-bold text-green-800 text-lg" id="preview-name"></p>
                     <p class="text-sm text-green-600" id="preview-dept"></p>
                 </div>
                 <button id="btn-student-login" class="w-full bg-sky-600 text-white px-4 py-4 rounded-xl font-bold text-lg hover:bg-sky-700 transition shadow-lg">ยืนยันข้อมูลและเริ่มสอบ</button>
-                <button onclick="location.reload()" class="w-full text-slate-400 text-sm underline">กลับหน้าแรก</button>
+                <button onclick="location.reload()" class="w-full text-slate-400 text-sm hover:underline">ยกเลิก</button>
             </div>
         </div>
 
         <!-- 4. Student Exam -->
-        <div id="page-student-exam" class="page m-auto bg-white w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden mt-4 flex-col h-[85vh]">
-            <div class="bg-white p-5 border-b flex justify-between items-center">
+        <div id="page-student-exam" class="page m-auto bg-white w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden mt-4 flex-col h-[85vh] border border-slate-200">
+            <div class="bg-white p-5 border-b border-slate-100 flex justify-between items-center">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center font-bold">U</div>
                     <div><h2 class="font-bold text-slate-800 text-sm" id="exam-student-name">...</h2><p class="text-xs text-slate-500" id="exam-student-dept">...</p></div>
                 </div>
-                <div class="text-right"><span class="text-3xl font-black text-sky-600" id="q-current">1</span><span class="text-sm text-slate-400">/ 40</span></div>
+                <div class="text-right"><span class="text-3xl font-black text-sky-600" id="q-current">1</span><span class="text-sm text-slate-400 font-medium">/ 40</span></div>
             </div>
-            <div class="w-full bg-slate-100 h-1"><div id="progress-bar" class="bg-sky-500 h-full transition-all" style="width: 0%"></div></div>
-            <div class="flex-1 p-6 overflow-y-auto bg-slate-50">
+            <div class="w-full bg-slate-100 h-1.5"><div id="progress-bar" class="bg-sky-500 h-1.5 transition-all duration-500" style="width: 0%"></div></div>
+            <div class="flex-1 p-6 md:p-10 overflow-y-auto flex flex-col justify-center bg-slate-50">
                 <div id="question-card" class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
                     <h3 class="text-xl md:text-2xl font-medium text-slate-800 mb-6 leading-relaxed" id="question-text">...</h3>
                     <div id="question-image-container" class="mb-6 hidden flex justify-center">
-                        <img id="question-image" src="" alt="Question" class="max-h-60 rounded-lg shadow-md border">
+                        <img id="question-image" src="" alt="Component" class="max-h-60 rounded-lg shadow-md border">
                     </div>
                     <div id="options-container" class="space-y-4"></div>
                 </div>
             </div>
-            <div class="p-5 bg-white border-t flex justify-between items-center">
-                <button id="btn-prev" class="px-6 py-3 rounded-xl font-bold text-slate-400" disabled>ย้อนกลับ</button>
-                <button id="btn-next" class="px-8 py-3 rounded-xl font-bold bg-sky-600 text-white">ถัดไป</button>
-                <button id="btn-submit" class="hidden px-8 py-3 rounded-xl font-bold bg-green-600 text-white">ส่งคำตอบ</button>
+            <div class="p-5 bg-white border-t border-slate-100 flex justify-between items-center">
+                <button id="btn-prev" class="px-6 py-3 rounded-xl font-bold text-slate-400 hover:bg-slate-50 transition" disabled><i class="fa-solid fa-arrow-left mr-2"></i> ย้อนกลับ</button>
+                <button id="btn-next" class="px-8 py-3 rounded-xl font-bold bg-sky-600 text-white hover:bg-sky-700 transition shadow-md">ข้อถัดไป <i class="fa-solid fa-arrow-right ml-2"></i></button>
+                <button id="btn-submit" class="hidden px-8 py-3 rounded-xl font-bold bg-green-600 text-white hover:bg-green-700 transition shadow-md">ส่งคำตอบ <i class="fa-solid fa-check-circle ml-2"></i></button>
             </div>
         </div>
 
         <!-- 5. Submitted -->
-        <div id="page-submitted" class="page m-auto bg-white p-12 rounded-3xl shadow-2xl text-center max-w-lg mt-10">
-            <div class="mb-6 text-8xl">✅</div>
-            <h2 class="text-3xl font-black text-slate-800 mb-2">ส่งคำตอบเรียบร้อย</h2>
-            <p class="text-slate-500 text-lg mb-8">ขอบคุณที่ร่วมทำแบบทดสอบ</p>
-            <button onclick="location.reload()" class="bg-slate-100 text-slate-600 px-8 py-3 rounded-full font-bold">กลับหน้าแรก</button>
+        <div id="page-submitted" class="page m-auto bg-white p-12 rounded-3xl shadow-2xl text-center max-w-lg mt-10 border-4 relative overflow-hidden" id="submitted-card">
+            <div id="submit-emoji" class="mb-6 text-8xl">🎉</div>
+            <h2 id="submit-title" class="text-3xl font-black text-slate-800 mb-2">ส่งคำตอบเรียบร้อย!</h2>
+            <div id="pass-fail-badge" class="inline-block px-6 py-2 rounded-full font-black text-xl mb-6 shadow-sm">...</div>
+            <p id="submit-message" class="text-slate-500 text-lg mb-8">ขอบคุณที่ร่วมทำแบบทดสอบ</p>
+            <button onclick="location.reload()" class="bg-slate-100 text-slate-600 px-8 py-3 rounded-full font-bold hover:bg-slate-200 transition">กลับหน้าแรก</button>
         </div>
 
         <!-- 6. Teacher Login -->
         <div id="page-teacher-login" class="page bg-white p-8 rounded-2xl shadow-xl max-w-md mx-auto mt-10">
             <h2 class="text-2xl font-bold text-center text-sky-700 mb-6">สำหรับครู</h2>
-            <input type="password" id="teacher-room-code" class="w-full px-4 py-3 border rounded-xl mb-4 text-center" placeholder="รหัสห้อง">
-            <button id="btn-teacher-login" class="w-full bg-sky-600 text-white px-4 py-4 rounded-xl font-bold">เข้าสู่ Dashboard</button>
+            <div class="space-y-4">
+                <input type="password" id="teacher-room-code" class="w-full px-4 py-3 border rounded-xl outline-none focus:border-sky-500 transition text-center" placeholder="กรอกรหัสผ่าน">
+                <button id="btn-teacher-login" class="w-full bg-sky-600 text-white px-4 py-4 rounded-xl font-bold hover:bg-sky-700 transition shadow-lg">เข้าสู่ระบบ Dashboard</button>
+                <button onclick="location.reload()" class="w-full text-slate-400 text-sm">กลับหน้าหลัก</button>
+            </div>
         </div>
     </div>
 
@@ -202,7 +241,7 @@
             { t: "การประกอบตัวอุปกรณ์ (Comp.)ชนิดที่มีขั้วโลหะ (Terminal) เพื่อวางยึดติดบนผิวหน้า PCB เรียกว่าการประกอบงานแบบใด", opts: ["COB", "PTH", "SMD", "ไม่มีข้อถูก"], a: 2 },
             { t: "อุปกรณ์ในข้อใดที่สามารถเปลี่ยนกระแสไฟฟ้าให้เป็นแสงโดยตรง", opts: ["LED (แอล อี ดี)", "Transistor (ทรานซิสเตอร์)", "Resistor (รีซีสเตอร์)", "Capacitor (คาปาซิเตอร์)"], a: 0 },
             { t: "อุปกรณ์ใด ที่นำลวดทองแดงมาพันเป็นขดจำนวนหลายๆ รอบ มีความเหนี่ยวนำทางไฟฟ้าที่เกิดขึ้นในรูปของสนามแม่เหล็ก", opts: ["Resistor (รีซีสเตอร์)", "Capacitor (คาปาซิเตอร์)", "Inductor (อินดัคเตอร์)", "Transistor (ทรานซิสเตอร์)"], a: 2 },
-            { t: "อุปกรณ์ในข้อใด ที่ทำหน้าที่เปลี่ยนสัญญาณไฟฟ้า เป็นสัญญาณเสียง แต่จะทำงานได้ต้องอาศัยแรงดันป้อนเข้ามา", opts: ["Inductor (อินดัคเตอร์)", "Capacitor (คาปาซิเตอร์)", "Buzzer (บัชเซอร์)", "Transistor (ทรานซิสเตอร์)"], a: 2 },
+            { t: "อุปกรณ์ในข้อใดที่ทำหน้าที่เปลี่ยนสัญญาณไฟฟ้า เป็นสัญญาณเสียง แต่จะทำงานได้ต้องอาศัยแรงดันป้อนเข้ามา", opts: ["Inductor (อินดัคเตอร์)", "Capacitor (คาปาซิเตอร์)", "Buzzer (บัชเซอร์)", "Transistor (ทรานซิสเตอร์)"], a: 2 },
             { t: "พื้นที่ ที่อยู่บนพื้นผิวแผงวงจรใช้สำหรับการบัดกรี หรือประกอบตัวอุปกรณ์ต่างๆ เรียกว่าอะไร", opts: ["Component (คอมโพเน้นท์)", "Solder Resist (โซลเดอร์ รีซีส)", "Terminal (เทอร์มินอล)", "Pad, Land (แพด, แลนด์)"], a: 3 },
             { t: "จากรูปภาพ คืออุปกรณ์ชนิดใด?", img: "images/A.jpg", opts: ["Inductor (ชิบ อินดัคเตอร์)", "Resistor (รีซีสเตอร์)", "Capacitor (คาปาซิเตอร์)", "Diode (ซีเนอร์ ไดโอด)"], a: 0 },
             { t: "จากรูปภาพ คืออุปกรณ์ชนิดใด?", img: "images/B.jpg", opts: ["Connector (คอนเนกเตอร์)", "Integrate Circuit (อินดิเกรทเซอร์กิต)", "Switch (สวิทซ์) ", "Transistor (ทรานซิสเตอร์)"], a: 1 },
@@ -226,20 +265,16 @@
         let db, auth, currentStudent = null, studentCache = null, isFetching = false;
         let configRef, studentsRef, studentQuestions = [], studentAnswersMap = {}, currentQIndex = 0;
         let studentOptionOrders = {}, allResults = [];
+        let systemConfig = { isOpen: false, isShuffle: true, passPercentage: 60 };
 
-        // Define updateLog in the script scope
         function updateLog(msg) {
             const el = document.getElementById('loading-log');
             if (el) el.innerText = msg;
         }
 
-        // Define hideLoadingForce in the window scope for the button to access it
-        window.hideLoadingForce = () => {
-            document.getElementById('loading-overlay').style.display = 'none';
-        };
-
         async function init() {
             try {
+                updateLog("กำลังเชื่อมต่อฐานข้อมูล...");
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
@@ -249,7 +284,7 @@
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         updateLog("เชื่อมต่อสำเร็จ!");
-                        window.hideLoadingForce();
+                        document.getElementById('loading-overlay').style.display = 'none';
                     } else {
                         await signInAnonymously(auth);
                     }
@@ -269,82 +304,61 @@
             else el.style.display = 'block';
         };
 
-        // --- GOOGLE SHEETS HELPER ---
-        async function fetchStudents() { 
-            if (studentCache) return studentCache;
-            if (isFetching) return [];
-            isFetching = true;
-            try {
-                updateLog("กำลังดึงรายชื่อพนักงานจาก Google Sheet...");
-                const res = await fetch(SHEET_URL + "&t=" + Date.now()); 
-                if (!res.ok) throw new Error("ไม่สามารถอ่านไฟล์จาก Google Sheet ได้");
-                const csv = await res.text(); 
-                return new Promise((resolve) => {
-                    Papa.parse(csv, {
-                        header: true, skipEmptyLines: true, 
-                        complete: (results) => {
-                            const rawData = results.data;
-                            const normalized = rawData.map(row => {
-                                const newRow = {};
-                                Object.keys(row).forEach(key => {
-                                    const cleanKey = key.trim().replace(/\s+/g, '');
-                                    newRow[cleanKey] = row[key];
-                                });
-                                return newRow;
-                            });
-                            
-                            if(normalized.length > 0) {
-                                console.log("Headers Found:", Object.keys(normalized[0]));
-                                const diag = document.getElementById('diagnostic-box');
-                                const diagTxt = document.getElementById('diagnostic-text');
-                                if (diag) diag.classList.remove('hidden');
-                                if (diagTxt) diagTxt.innerText = `อ่านรายชื่อสำเร็จ: ${normalized.length} แถว\nคอลัมน์ที่พบ: ${Object.keys(normalized[0]).join(', ')}`;
-                            }
-
-                            studentCache = normalized;
-                            isFetching = false;
-                            updateLog("พร้อมใช้งาน");
-                            resolve(normalized);
-                        }
-                    });
-                });
-            } catch (err) {
-                isFetching = false;
-                alert("เกิดข้อผิดพลาดในการโหลดรายชื่อ: " + err.message);
-                return [];
-            }
-        }
-
         // --- TEACHER SYSTEM ---
         function initTeacherDashboard() {
+            // Setup Table Header
             const thead = document.querySelector('thead #grid-header-row');
-            thead.innerHTML = `<th class="p-3 border-b w-12 text-center bg-slate-50 sticky left-0 z-20">#</th><th class="p-3 border-b w-24 text-center bg-slate-50 sticky left-12 z-20">รหัส</th><th class="p-3 border-b min-w-[200px] bg-slate-50 sticky left-[144px] z-20 border-r">ชื่อ-สกุล</th><th class="p-3 border-b w-24 text-center bg-slate-50">สถานะ</th><th class="p-3 border-b w-20 text-center bg-slate-50 text-sky-700 font-bold">%</th>`;
+            thead.innerHTML = `<th class="p-3 border-b w-12 text-center bg-slate-50 sticky left-0 z-20">#</th><th class="p-3 border-b w-24 text-center bg-slate-50 sticky left-12 z-20">รหัส</th><th class="p-3 border-b min-w-[200px] bg-slate-50 sticky left-[144px] z-20 border-r">ชื่อ-สกุล</th><th class="p-3 border-b w-20 text-center bg-slate-50">สถานะ</th><th class="p-3 border-b w-16 text-center bg-slate-50 font-bold">เวลา</th><th class="p-3 border-b w-20 text-center bg-slate-50 text-sky-700 font-bold">%</th>`;
             MASTER_QUESTIONS.forEach((_, i) => {
                 const th = document.createElement('th');
                 th.className = "p-2 border-b text-center w-12 font-bold text-slate-400 text-xs";
                 th.innerText = i + 1; thead.appendChild(th);
             });
 
+            // Monitor Config
             onSnapshot(configRef, (snap) => {
-                const isOpen = snap.exists() ? snap.data().isOpen : false;
-                const btn = document.getElementById('btn-toggle-system');
-                btn.innerHTML = isOpen ? `<i class="fa-solid fa-pause"></i> ปิดระบบ` : `<i class="fa-solid fa-play"></i> เปิดระบบ`;
-                btn.className = isOpen ? "px-6 py-2.5 rounded-xl text-white font-bold bg-amber-500" : "px-6 py-2.5 rounded-xl text-white font-bold bg-emerald-500";
-                btn.onclick = async () => {
-                    const status = !isOpen;
-                    await setDoc(configRef, { isOpen: status }, { merge: true });
-                };
-                document.getElementById('txt-system-status').innerText = isOpen ? 'ระบบเปิดอยู่' : 'ระบบปิดอยู่';
+                if (snap.exists()) {
+                    systemConfig = snap.data();
+                    const isOpen = systemConfig.isOpen || false;
+                    const isShuffle = (systemConfig.isShuffle !== undefined) ? systemConfig.isShuffle : true;
+                    const passMark = systemConfig.passPercentage || 60;
+
+                    const btnSys = document.getElementById('btn-toggle-system');
+                    btnSys.innerHTML = isOpen ? `<i class="fa-solid fa-pause"></i> ปิดรับคำตอบ` : `<i class="fa-solid fa-play"></i> เปิดรับคำตอบ`;
+                    btnSys.className = isOpen ? "px-4 py-2 rounded-lg text-white font-bold bg-amber-500 text-sm shadow-md" : "px-4 py-2 rounded-lg text-white font-bold bg-emerald-500 text-sm shadow-md";
+                    document.getElementById('txt-system-status').innerText = isOpen ? 'ระบบเปิดอยู่' : 'ระบบปิดอยู่';
+
+                    const btnShuf = document.getElementById('btn-toggle-shuffle');
+                    btnShuf.innerHTML = isShuffle ? `<i class="fa-solid fa-shuffle"></i> สุ่มข้อสอบ` : `<i class="fa-solid fa-list-ol"></i> เรียงตามข้อ`;
+                    btnShuf.className = isShuffle ? "px-4 py-2 rounded-lg text-white font-bold bg-indigo-500 text-sm shadow-md" : "px-4 py-2 rounded-lg text-white font-bold bg-slate-500 text-sm shadow-md";
+
+                    document.getElementById('select-pass-mark').value = passMark;
+                }
             });
 
+            // Monitor Data
             onSnapshot(query(studentsRef), (snap) => {
                 allResults = []; 
                 snap.forEach(d => allResults.push(d.data()));
                 renderGrid();
             });
+
+            document.getElementById('btn-toggle-system').onclick = async () => await setDoc(configRef, { ...systemConfig, isOpen: !systemConfig.isOpen }, { merge: true });
+            document.getElementById('btn-toggle-shuffle').onclick = async () => await setDoc(configRef, { ...systemConfig, isShuffle: !systemConfig.isShuffle }, { merge: true });
+            document.getElementById('select-pass-mark').onchange = async (e) => await setDoc(configRef, { ...systemConfig, passPercentage: parseInt(e.target.value) }, { merge: true });
             
             document.getElementById('toggle-answers').onchange = () => renderGrid();
             document.getElementById('toggle-names').onchange = () => renderGrid();
+            
+            // Clear DB Action
+            document.getElementById('btn-clear-db').onclick = async () => {
+                if (!confirm("⚠️ คำเตือน: คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลผู้เข้าสอบทั้งหมด? การกระทำนี้ไม่สามารถย้อนกลับได้")) return;
+                const snap = await getDocs(studentsRef);
+                const batch = writeBatch(db);
+                snap.forEach(d => batch.delete(d.ref));
+                await batch.commit();
+                alert("ล้างข้อมูลเรียบร้อย");
+            };
         }
 
         function renderGrid() {
@@ -354,23 +368,33 @@
             tbody.innerHTML = '';
             document.getElementById('student-count').innerText = allResults.length;
             
-            allResults.sort((a,b) => (b.status === 'submitted' ? 1 : 0) - (a.status === 'submitted' ? 1 : 0));
+            // SORTING: Highest Score First, then Lowest Time Taken
+            allResults.sort((a,b) => {
+                const scoreA = a.score || 0;
+                const scoreB = b.score || 0;
+                if (scoreB !== scoreA) return scoreB - scoreA;
+                return (a.timeTaken || 999999) - (b.timeTaken || 999999);
+            });
             
             allResults.forEach((s, i) => {
                 const tr = document.createElement('tr'); 
                 tr.className = "hover:bg-slate-50 border-b group";
                 
+                const timeStr = s.timeTaken ? (s.timeTaken < 60 ? `${s.timeTaken.toFixed(0)} ว.` : `${(s.timeTaken/60).toFixed(1)} น.`) : '-';
+                const isPassed = (s.score !== null && s.score >= (systemConfig.passPercentage || 60));
+                
                 let html = `
                     <td class="p-3 text-center text-slate-400 text-xs sticky left-0 bg-white group-hover:bg-slate-50 z-10">${i+1}</td>
                     <td class="p-3 text-center text-slate-600 font-mono text-xs sticky left-12 bg-white group-hover:bg-slate-50 z-10">${s.studentId}</td>
                     <td class="p-3 whitespace-nowrap sticky left-[144px] bg-white group-hover:bg-slate-50 z-10 border-r">
-                        <div class="text-slate-700 font-medium text-sm">${showNames ? s.name : '***'}</div>
+                        <div class="text-slate-700 font-medium text-sm">${showNames ? s.name : '*** (ซ่อนชื่อ)'}</div>
                         <div class="text-[10px] text-slate-400">${s.dept || '-'}</div>
                     </td>
                     <td class="p-3 text-center">
-                        ${s.status === 'submitted' ? '<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[10px] font-bold">ส่งแล้ว</span>' : '<span class="bg-sky-100 text-sky-700 px-2 py-0.5 rounded text-[10px] font-bold">กำลังทำ</span>'}
+                        ${s.status === 'submitted' ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${isPassed ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">ส่งแล้ว</span>` : '<span class="bg-sky-100 text-sky-700 px-2 py-0.5 rounded text-[10px] font-bold">กำลังทำ</span>'}
                     </td>
-                    <td class="p-3 text-center font-bold text-slate-700 text-sm">
+                    <td class="p-3 text-center text-xs text-slate-500 font-mono">${timeStr}</td>
+                    <td class="p-3 text-center font-bold text-sm ${isPassed ? 'text-green-600' : 'text-slate-700'}">
                         ${s.score !== null ? Math.round(s.score)+'%' : '-'}
                     </td>
                 `;
@@ -393,37 +417,63 @@
         }
 
         // --- STUDENT SYSTEM ---
+        async function fetchStudents() { 
+            if (studentCache) return studentCache;
+            if (isFetching) return [];
+            isFetching = true;
+            try {
+                const res = await fetch(SHEET_URL + "&t=" + Date.now()); 
+                if (!res.ok) throw new Error("Connection Error");
+                const csv = await res.text(); 
+                return new Promise((resolve) => {
+                    Papa.parse(csv, {
+                        header: true, skipEmptyLines: true, 
+                        complete: (results) => {
+                            const normalized = results.data.map(row => {
+                                const newRow = {};
+                                Object.keys(row).forEach(key => { newRow[key.trim().replace(/\s+/g, '')] = row[key]; });
+                                return newRow;
+                            });
+                            studentCache = normalized;
+                            isFetching = false;
+                            resolve(normalized);
+                        }
+                    });
+                });
+            } catch (err) {
+                isFetching = false;
+                return [];
+            }
+        }
+
         document.getElementById('student-id').addEventListener('input', async (e) => { 
             const id = e.target.value.trim(); 
             if (id.length < 3) { document.getElementById('student-preview').classList.add('hidden'); return; }
             const list = await fetchStudents(); 
             const s = list.find(x => (x['รหัสประจำตัว'] || x['รหัส'] || x['EmployeeID']) == id); 
             if (s) { 
-                const fullName = (s['ชื่อ'] || "") + " " + (s['นามสกุล'] || "");
-                document.getElementById('preview-name').innerText = fullName; 
+                document.getElementById('preview-name').innerText = (s['ชื่อ'] || "") + " " + (s['นามสกุล'] || ""); 
                 document.getElementById('preview-dept').innerText = s['แผนก'] || ""; 
                 document.getElementById('student-preview').classList.remove('hidden'); 
-            } else {
-                document.getElementById('student-preview').classList.add('hidden'); 
-            }
+            } else { document.getElementById('student-preview').classList.add('hidden'); }
         });
 
         document.getElementById('btn-student-login').onclick = async () => {
             const id = document.getElementById('student-id').value.trim();
             if (!id) return alert("กรุณากรอกรหัสพนักงาน");
             
-            const conf = await getDoc(configRef); 
-            if (!conf.exists() || !conf.data().isOpen) return alert("❌ ขณะนี้ระบบยังไม่เปิดรับคำตอบ");
+            const confSnap = await getDoc(configRef);
+            if (!confSnap.exists() || !confSnap.data().isOpen) return alert("❌ ขณะนี้ระบบปิดรับคำตอบ");
+            systemConfig = confSnap.data();
 
             const list = await fetchStudents(); 
             const s = list.find(x => (x['รหัสประจำตัว'] || x['รหัส'] || x['EmployeeID']) == id); 
-            if (!s) return alert("❌ ไม่พบข้อมูลพนักงานรหัสนี้ กรุณาตรวจสอบรหัสอีกครั้ง");
+            if (!s) return alert("❌ ไม่พบข้อมูลพนักงานรหัสนี้");
 
             currentStudent = { 
                 id: (s['รหัสประจำตัว'] || s['รหัส'] || s['EmployeeID']), 
                 name: (s['ชื่อ'] || "") + " " + (s['นามสกุล'] || ""), 
-                dept: s['แผนก'] || "", 
-                startTime: Date.now() 
+                dept: s['แผนก'] || "", startTime: Date.now() 
             };
             
             const existing = await getDoc(doc(studentsRef, currentStudent.id));
@@ -432,14 +482,21 @@
             if (!existing.exists()) { 
                 await setDoc(doc(studentsRef, currentStudent.id), { 
                     studentId: currentStudent.id, name: currentStudent.name, dept: currentStudent.dept, 
-                    status: 'online', score: null, answers: new Array(40).fill(null) 
+                    status: 'online', score: null, answers: new Array(40).fill(null), startTime: Date.now()
                 }); 
             } else {
-                const saved = existing.data().answers;
-                saved.forEach((v, idx) => { if(v !== null) studentAnswersMap[idx] = v; });
+                const data = existing.data();
+                if (data.answers) data.answers.forEach((v, idx) => { if(v !== null) studentAnswersMap[idx] = v; });
+                if (data.startTime) currentStudent.startTime = data.startTime;
             }
 
-            studentQuestions = MASTER_QUESTIONS.map((q, i) => ({...q, originalIndex: i})).sort(() => Math.random() - 0.5);
+            // Logic Shuffle based on Teacher Config
+            if (systemConfig.isShuffle !== false) {
+                studentQuestions = MASTER_QUESTIONS.map((q, i) => ({...q, originalIndex: i})).sort(() => Math.random() - 0.5);
+            } else {
+                studentQuestions = MASTER_QUESTIONS.map((q, i) => ({...q, originalIndex: i}));
+            }
+            
             studentOptionOrders = {}; 
             studentQuestions.forEach(q => studentOptionOrders[q.originalIndex] = [0,1,2,3].sort(() => Math.random() - 0.5));
             
@@ -456,10 +513,7 @@
             document.getElementById('progress-bar').style.width = `${((currentQIndex + 1) / 40) * 100}%`;
             
             const imgC = document.getElementById('question-image-container');
-            if (q.img) {
-                imgC.classList.remove('hidden');
-                document.getElementById('question-image').src = q.img;
-            } else imgC.classList.add('hidden');
+            if (q.img) { imgC.classList.remove('hidden'); document.getElementById('question-image').src = q.img; } else imgC.classList.add('hidden');
             
             const optsC = document.getElementById('options-container');
             optsC.innerHTML = '';
@@ -486,35 +540,46 @@
         };
 
         document.getElementById('btn-next').onclick = () => {
-            if (studentAnswersMap[studentQuestions[currentQIndex].originalIndex] === undefined) return alert("กรุณาเลือกคำตอบ");
+            if (studentAnswersMap[studentQuestions[currentQIndex].originalIndex] === undefined) return alert("กรุณาเลือกคำตอบก่อน");
             currentQIndex++; renderQuestion();
         };
 
-        document.getElementById('btn-prev').onclick = () => {
-            if (currentQIndex > 0) { currentQIndex--; renderQuestion(); }
-        };
+        document.getElementById('btn-prev').onclick = () => { if (currentQIndex > 0) { currentQIndex--; renderQuestion(); }};
 
         document.getElementById('btn-submit').onclick = async () => {
             if (!confirm("ยืนยันส่งคำตอบ?")) return;
             let correct = 0;
             MASTER_QUESTIONS.forEach((q, i) => { if(studentAnswersMap[i] === q.a) correct++; });
+            const finalScore = (correct / 40) * 100;
+            const timeTaken = (Date.now() - currentStudent.startTime) / 1000;
+            
             await updateDoc(doc(studentsRef, currentStudent.id), { 
-                status: 'submitted', score: (correct/40)*100,
-                timeTaken: (Date.now() - currentStudent.startTime)/1000
+                status: 'submitted', score: finalScore, timeTaken: timeTaken
             });
+
+            // Pass/Fail Logic
+            const passMark = systemConfig.passPercentage || 60;
+            const badge = document.getElementById('pass-fail-badge');
+            if (finalScore >= passMark) {
+                badge.innerText = `ผ่านเกณฑ์ (${finalScore}%)`;
+                badge.className = "inline-block px-6 py-2 rounded-full font-black text-xl mb-6 shadow-sm bg-green-500 text-white animate-bounce";
+            } else {
+                badge.innerText = `ไม่ผ่านเกณฑ์ (${finalScore}%)`;
+                badge.className = "inline-block px-6 py-2 rounded-full font-black text-xl mb-6 shadow-sm bg-red-500 text-white";
+            }
             show('page-submitted');
         };
 
         document.getElementById('btn-dl-excel').onclick = () => {
             const data = allResults.map((s, i) => {
-                const row = { "ลำดับ": i+1, "รหัส": s.studentId, "ชื่อ": s.name, "คะแนน(%)": s.score };
-                s.answers.forEach((ans, idx) => { row[`ข้อ ${idx+1}`] = (ans === MASTER_QUESTIONS[idx].a) ? "ถูก" : "ผิด/ไม่ตอบ"; });
+                const row = { "ลำดับ": i+1, "รหัส": s.studentId, "ชื่อ": s.name, "แผนก": s.dept, "เวลาที่ใช้(วินาที)": s.timeTaken ? s.timeTaken.toFixed(0) : '-', "คะแนน(%)": s.score };
+                s.answers.forEach((ans, idx) => { row[`ข้อ ${idx+1}`] = (ans === MASTER_QUESTIONS[idx].a) ? "ถูก" : (ans === null ? "ไม่ตอบ" : "ผิด"); });
                 return row;
             });
             const ws = XLSX.utils.json_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Results");
-            XLSX.writeFile(wb, "Electronics_Results.xlsx");
+            XLSX.writeFile(wb, "Exam_Results_2026.xlsx");
         };
 
         document.getElementById('btn-teacher-login').onclick = () => {
@@ -525,9 +590,602 @@
 
         document.getElementById('btn-go-teacher').onclick = () => show('page-teacher-login');
         document.getElementById('btn-go-student').onclick = () => show('page-student-login');
+
+        init();
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Electronics - Exam System v11.5</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Sarabun:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    
+    <style>
+        body { font-family: 'Sarabun', 'Inter', sans-serif; background-color: #f0f9ff; overflow-x: hidden; }
+        .page { display: none; }
         
-        // Add click listener for force skip button
-        document.getElementById('btn-force-skip').onclick = () => window.hideLoadingForce();
+        #loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.98); z-index: 9999;
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
+            text-align: center; padding: 20px;
+        }
+        .spinner { border: 4px solid #e0f2fe; border-top: 4px solid #0284c7; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .float-up { animation: floatUp 0.8s ease-out forwards; }
+        @keyframes floatUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        #page-home { display: flex; } 
+    </style>
+</head>
+<body class="text-gray-800 relative">
+
+    <div id="app" class="w-full min-h-screen flex flex-col relative z-10">
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay">
+            <div class="spinner mb-6"></div>
+            <h2 class="text-sky-700 font-bold text-2xl mb-2">Basic Electronics</h2>
+            <div id="loading-log" class="text-sm text-gray-500 mb-6 font-mono h-6">กำลังเริ่มต้น...</div>
+            <div id="diagnostic-box" class="hidden bg-amber-50 border border-amber-200 text-amber-700 p-4 rounded-xl text-xs max-w-md mb-4 text-left">
+                <p class="font-bold mb-1">สถานะระบบ:</p>
+                <p id="diagnostic-text" class="font-mono whitespace-pre-wrap"></p>
+            </div>
+        </div>
+
+        <!-- 1. Landing Page -->
+        <div id="page-home" class="page w-full min-h-screen relative overflow-hidden bg-gradient-to-br from-sky-100 via-white to-blue-50 flex items-center justify-center">
+            <div class="relative z-20 text-center max-w-4xl mx-auto px-4 float-up">
+                <div class="mb-8 inline-flex items-center gap-3 bg-white px-6 py-3 rounded-full shadow-md border border-sky-100">
+                    <i class="fa-solid fa-industry text-sky-600 text-3xl"></i>
+                    <span class="text-2xl font-extrabold text-gray-800">Electronics Dept.</span>
+                </div>
+                <h1 class="text-5xl md:text-7xl font-black text-sky-800 tracking-tighter mb-2">Basic Electronics</h1>
+                <h2 class="text-xl md:text-3xl font-bold text-sky-600 mb-10">Component Testing 2026</h2>
+                
+                <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
+                    <button id="btn-go-teacher" class="bg-white text-sky-700 px-10 py-4 rounded-full font-bold text-xl shadow-lg border-2 border-sky-100 hover:scale-105 transition">
+                        <i class="fa-solid fa-chalkboard-user mr-2"></i> ระบบครู
+                    </button>
+                    <button id="btn-go-student" class="bg-sky-600 text-white px-10 py-4 rounded-full font-bold text-xl shadow-lg hover:bg-sky-700 hover:scale-105 transition">
+                        <i class="fa-solid fa-user-graduate mr-2"></i> ระบบพนักงาน
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Teacher Dashboard -->
+        <div id="page-teacher-dashboard" class="page w-full max-w-[95%] mx-auto pt-6 px-4 pb-12">
+            <!-- Header & System Controls -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-sky-100 flex flex-wrap justify-between items-start gap-4 mb-6">
+                <div class="flex items-center gap-4">
+                    <div class="bg-sky-100 p-3 rounded-xl text-sky-600"><i class="fa-solid fa-chart-pie text-2xl"></i></div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800">Monitor Room</h2>
+                        <p class="text-slate-500 text-sm">พนักงานทั้งหมด: <span id="student-count" class="font-bold text-sky-600">0</span> คน</p>
+                    </div>
+                </div>
+                
+                <div class="flex flex-wrap gap-4 items-center bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <!-- Toggle System -->
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase">สถานะรับคำตอบ</label>
+                        <button id="btn-toggle-system" class="px-4 py-2 rounded-lg text-white font-bold text-sm shadow-md transition bg-gray-400">
+                            <span id="txt-system-status">Checking...</span>
+                        </button>
+                    </div>
+                    <!-- Toggle Shuffle -->
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase">การสุ่มคำถาม</label>
+                        <button id="btn-toggle-shuffle" class="px-4 py-2 rounded-lg text-white font-bold text-sm shadow-md transition bg-indigo-500 hover:bg-indigo-600">
+                            <span id="txt-shuffle-status">สุ่มข้อสอบ</span>
+                        </button>
+                    </div>
+                    <!-- Pass Score Setting -->
+                    <div class="flex flex-col gap-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase">เกณฑ์การผ่าน (%)</label>
+                        <select id="select-pass-mark" class="px-3 py-2 rounded-lg border border-slate-200 text-sm font-bold outline-none focus:border-sky-500">
+                            <option value="60">60%</option>
+                            <option value="70">70%</option>
+                            <option value="80">80%</option>
+                            <option value="90">90%</option>
+                            <option value="100">100%</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <button id="btn-dl-excel" class="bg-emerald-500 text-white px-4 py-2.5 rounded-xl hover:bg-emerald-600 transition font-bold shadow-md flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-file-excel"></i> Export Excel
+                    </button>
+                    <button id="btn-clear-db" class="bg-red-500 text-white px-4 py-2.5 rounded-xl hover:bg-red-600 transition font-bold shadow-md flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-trash"></i> ล้างระบบ
+                    </button>
+                    <button onclick="location.reload()" class="px-3 py-2.5 rounded-xl bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition"><i class="fa-solid fa-rotate"></i></button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-sky-100 overflow-hidden h-[600px] flex flex-col">
+                <div class="p-4 border-b bg-slate-50 font-bold text-slate-600 flex justify-between items-center text-sm">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-list-check"></i> ตารางคะแนน (เรียงตามคะแนนและเวลา)</span>
+                    <div class="flex gap-4">
+                         <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="toggle-names" checked class="accent-sky-600"> ชื่อ</label>
+                         <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="toggle-answers" class="accent-green-600"> เฉลย</label>
+                    </div>
+                </div>
+                <div class="flex-1 overflow-auto">
+                    <table class="w-full text-left border-collapse min-w-[2200px]">
+                        <thead class="bg-white sticky top-0 z-10 text-[10px] uppercase text-slate-500 shadow-sm border-b">
+                            <tr id="grid-header-row"></tr>
+                        </thead>
+                        <tbody id="grid-body" class="text-sm divide-y divide-slate-50">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Student Login -->
+        <div id="page-student-login" class="page m-auto bg-white p-8 rounded-2xl shadow-xl max-w-md w-full mt-10 border border-sky-50">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-slate-800">เข้าห้องสอบ</h2>
+                <p class="text-slate-400 text-sm">กรุณากรอกรหัสประจำตัวพนักงาน</p>
+            </div>
+            <div class="space-y-5">
+                <input type="text" id="student-id" class="w-full px-4 py-3.5 border-2 border-slate-100 rounded-xl text-center text-xl font-bold tracking-widest focus:border-sky-500 outline-none transition" placeholder="รหัสพนักงาน">
+                <div id="student-preview" class="hidden bg-green-50 p-4 rounded-xl text-center border border-green-100">
+                    <p class="font-bold text-green-800 text-lg" id="preview-name"></p>
+                    <p class="text-sm text-green-600" id="preview-dept"></p>
+                </div>
+                <button id="btn-student-login" class="w-full bg-sky-600 text-white px-4 py-4 rounded-xl font-bold text-lg hover:bg-sky-700 transition shadow-lg">ยืนยันข้อมูลและเริ่มสอบ</button>
+                <button onclick="location.reload()" class="w-full text-slate-400 text-sm hover:underline">ยกเลิก</button>
+            </div>
+        </div>
+
+        <!-- 4. Student Exam -->
+        <div id="page-student-exam" class="page m-auto bg-white w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden mt-4 flex-col h-[85vh] border border-slate-200">
+            <div class="bg-white p-5 border-b border-slate-100 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center font-bold">U</div>
+                    <div><h2 class="font-bold text-slate-800 text-sm" id="exam-student-name">...</h2><p class="text-xs text-slate-500" id="exam-student-dept">...</p></div>
+                </div>
+                <div class="text-right"><span class="text-3xl font-black text-sky-600" id="q-current">1</span><span class="text-sm text-slate-400 font-medium">/ 40</span></div>
+            </div>
+            <div class="w-full bg-slate-100 h-1.5"><div id="progress-bar" class="bg-sky-500 h-1.5 transition-all duration-500" style="width: 0%"></div></div>
+            <div class="flex-1 p-6 md:p-10 overflow-y-auto flex flex-col justify-center bg-slate-50">
+                <div id="question-card" class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 class="text-xl md:text-2xl font-medium text-slate-800 mb-6 leading-relaxed" id="question-text">...</h3>
+                    <div id="question-image-container" class="mb-6 hidden flex justify-center">
+                        <img id="question-image" src="" alt="Component" class="max-h-60 rounded-lg shadow-md border">
+                    </div>
+                    <div id="options-container" class="space-y-4"></div>
+                </div>
+            </div>
+            <div class="p-5 bg-white border-t border-slate-100 flex justify-between items-center">
+                <button id="btn-prev" class="px-6 py-3 rounded-xl font-bold text-slate-400 hover:bg-slate-50 transition" disabled><i class="fa-solid fa-arrow-left mr-2"></i> ย้อนกลับ</button>
+                <button id="btn-next" class="px-8 py-3 rounded-xl font-bold bg-sky-600 text-white hover:bg-sky-700 transition shadow-md">ข้อถัดไป <i class="fa-solid fa-arrow-right ml-2"></i></button>
+                <button id="btn-submit" class="hidden px-8 py-3 rounded-xl font-bold bg-green-600 text-white hover:bg-green-700 transition shadow-md">ส่งคำตอบ <i class="fa-solid fa-check-circle ml-2"></i></button>
+            </div>
+        </div>
+
+        <!-- 5. Submitted -->
+        <div id="page-submitted" class="page m-auto bg-white p-12 rounded-3xl shadow-2xl text-center max-w-lg mt-10 border-4 relative overflow-hidden" id="submitted-card">
+            <div id="submit-emoji" class="mb-6 text-8xl">🎉</div>
+            <h2 id="submit-title" class="text-3xl font-black text-slate-800 mb-2">ส่งคำตอบเรียบร้อย!</h2>
+            <div id="pass-fail-badge" class="inline-block px-6 py-2 rounded-full font-black text-xl mb-6 shadow-sm">...</div>
+            <p id="submit-message" class="text-slate-500 text-lg mb-8">ขอบคุณที่ร่วมทำแบบทดสอบ</p>
+            <button onclick="location.reload()" class="bg-slate-100 text-slate-600 px-8 py-3 rounded-full font-bold hover:bg-slate-200 transition">กลับหน้าแรก</button>
+        </div>
+
+        <!-- 6. Teacher Login -->
+        <div id="page-teacher-login" class="page bg-white p-8 rounded-2xl shadow-xl max-w-md mx-auto mt-10">
+            <h2 class="text-2xl font-bold text-center text-sky-700 mb-6">สำหรับครู</h2>
+            <div class="space-y-4">
+                <input type="password" id="teacher-room-code" class="w-full px-4 py-3 border rounded-xl outline-none focus:border-sky-500 transition text-center" placeholder="กรอกรหัสผ่าน">
+                <button id="btn-teacher-login" class="w-full bg-sky-600 text-white px-4 py-4 rounded-xl font-bold hover:bg-sky-700 transition shadow-lg">เข้าสู่ระบบ Dashboard</button>
+                <button onclick="location.reload()" class="w-full text-slate-400 text-sm">กลับหน้าหลัก</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, query, writeBatch, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCr08U5KYGvxXu-DZ5qZOyVnU_1MJ-oY50",
+            authDomain: "rba-online-6342e.firebaseapp.com",
+            projectId: "rba-online-6342e",
+            storageBucket: "rba-online-6342e.firebasestorage.app",
+            messagingSenderId: "50383344070",
+            appId: "1:50383344070:web:5003afe4c5530fc1d5a2c7"
+        };
+
+        const SHEET_URL = "https://docs.google.com/spreadsheets/d/1B1jOH7V3wtvdOTlL7BvwEHRpSIto1DIDwdT_n_P1SNc/export?format=csv&gid=0";
+        const TEACHER_CODE = "basic";
+        
+        const MASTER_QUESTIONS = [
+            { t: "อุปกรณ์ที่มีหน้าที่จำกัดการไหลของกระแสไฟฟ้าในวงจร คือ", opts: ["ขดลวด", "ตัวเก็บประจุ", "ตัวต้านทาน", "หม้อแปลง"], a: 2 },
+            { t: "อุปกรณ์อิเล็กทรอนิกส์ชนิดใด ที่ทำหน้าที่คล้ายกับแหล่งจ่ายไฟฟ้าในวงจร สามารถเก็บ หรือ คายประจุได้", opts: ["ตัวต้านทาน", "ตัวเก็บประจุ", "ตัวเหนี่ยวนำ", "หม้อแปลง"], a: 1 },
+            { t: "ตัวต้านทาน มีหน่วยในการวัดคือ", opts: ["โอห์ม", "โวลต์", "เฮนรี่", "แอมแปร์"], a: 0 },
+            { t: "ข้อใดเป็นอุปกรณ์อิเล็กทรอนิกส์ที่ผลิตมาจากสารกึ่งตัวนำ", opts: ["ตัวเหนี่ยวนำ", "ตัวเก็บประจุชนิดไมก้า", "ทรานซิสเตอร์", "หม้อแปลง"], a: 2 },
+            { t: "ตัวเก็บประจุ ใช้อักษรย่อใน Build Sheet (B/S) ว่าอย่างไร", opts: ["D", "IC", "C", "Q"], a: 2 },
+            { t: "ตัวต้านทาน ใช้อักษรย่อใน Build Sheet (B/S) ว่าอย่างไร", opts: ["R", "C", "L", "T"], a: 0 },
+            { t: "อุปกรณ์ข้อใด ที่เป็นตัวเก็บประจุแบบ SMD มีแถบสีเพื่อบ่งบอกว่าเป็นขั้วบวก ( + )", opts: ["เซรามิก คาปาฯ", "อิเล็คโทรไลติก คาปาฯ", "ชิบคาปาซิเตอร์", "แทนทาลัม คาปาฯ"], a: 3 },
+            { t: "ตัวเหนี่ยวนำมีหน่วยในการวัด คือ", opts: ["โอห์ม", "เฮนรี่", "โวลต์", "แอมแปร์"], a: 1 },
+            { t: "อุปกรณ์สารกึ่งตัวนำที่รวบรวมวงจรอิเล็กทรอนิกส์หลายชนิดไว้ในชิบ (Chip) สารกึ่งตัวนำที่เล็กมาก คือ", opts: ["ไดโอด", "ทรานซิสเตอร์", "ไทริสเตอร์", "วงจรรวม (IC)"], a: 3 },
+            { t: "อุปกรณ์ที่ใช้ทำหน้าที่เพิ่มหรือลดแรงเคลื่อนไฟฟ้ากระแสสลับ คือ", opts: ["หม้อแปลง", "ตัวเหนี่ยวนำ", "ตัวเก็บประจุ", "ตัวต้านทาน"], a: 0 },
+            { t: "ตัวเก็บประจุมีหน่วยการวัด คือ", opts: ["โวลต์", "โอห์ม", "ฟารัด", "แอมแปร์"], a: 2 },
+            { t: "อุปกรณ์อิเล็กทรอนิกส์ตัวใดที่ทำหน้าที่เปรียบได้กับวาล์วควบคุมที่ทำงานด้วยไฟฟ้า", opts: ["ตัวเก็บประจุ", "ตัวเหนี่ยวนำ", "ตัวต้านทาน", "ตัวทรานซิสเตอร์"], a: 3 },
+            { t: "ตัวเก็บประจุชนิดใดที่ต้องคำนึงถึงขั้วบวก ลบ เสมอเวลาประกอบลงบน แผ่น Board", opts: ["ชนิดเซรามิก", "ชนิดกระดาษ", "ชนิดอิเล็กโทรลิติก", "แวริเอเบิล"], a: 2 },
+            { t: "ตัวไดโอดมีหน้าที่ คือ", opts: ["ขยายสัญญาณ", "เครื่องแสดงผล", "ฟิลเตอร์", "ตัวเรียงกระแสโดยให้กระแสผ่านทางเดียว"], a: 3 },
+            { t: "ข้อใดเป็นอุปกรณ์ประเภทที่ไม่มีสารกึ่งตัวนำ", opts: ["Diode,Resistor", "LED,Inductor", "Capacitor, Resistor", "Diode, IC"], a: 2 },
+            { t: "ตัวเหนี่ยวนำจะใช้อักษรย่อใน Build sheet (B/S) ว่าอย่างไร", opts: ["L", "T", "D", "R"], a: 0 },
+            { t: "ตัวอุปกรณ์ที่ทำหน้าที่ขยายสัญญาณหรือขณะเดียวกันก็เป็นสวิทซ์ได้ ใช้อักษรย่อใน Build sheet (B/S) ว่าอย่างไร", opts: ["SW", "D, DR", "T, Q", "I.C, U"], a: 2 },
+            { t: "ข้อใดคือความหมายของแผงวงจร หรือแผ่นพิมพ์ลายวงจร", opts: ["PCB", "Board", "Substrate", "ถูกทุกข้อ"], a: 0 },
+            { t: "การประกอบตัวอุปกรณ์ (Comp.)ชนิดที่มีขั้วโลหะ (Terminal) เพื่อวางยึดติดบนผิวหน้า PCB เรียกว่าการประกอบงานแบบใด", opts: ["COB", "PTH", "SMD", "ไม่มีข้อถูก"], a: 2 },
+            { t: "อุปกรณ์ในข้อใดที่สามารถเปลี่ยนกระแสไฟฟ้าให้เป็นแสงโดยตรง", opts: ["LED (แอล อี ดี)", "Transistor (ทรานซิสเตอร์)", "Resistor (รีซีสเตอร์)", "Capacitor (คาปาซิเตอร์)"], a: 0 },
+            { t: "อุปกรณ์ใด ที่นำลวดทองแดงมาพันเป็นขดจำนวนหลายๆ รอบ มีความเหนี่ยวนำทางไฟฟ้าที่เกิดขึ้นในรูปของสนามแม่เหล็ก", opts: ["Resistor (รีซีสเตอร์)", "Capacitor (คาปาซิเตอร์)", "Inductor (อินดัคเตอร์)", "Transistor (ทรานซิสเตอร์)"], a: 2 },
+            { t: "อุปกรณ์ในข้อใดที่ทำหน้าที่เปลี่ยนสัญญาณไฟฟ้า เป็นสัญญาณเสียง แต่จะทำงานได้ต้องอาศัยแรงดันป้อนเข้ามา", opts: ["Inductor (อินดัคเตอร์)", "Capacitor (คาปาซิเตอร์)", "Buzzer (บัชเซอร์)", "Transistor (ทรานซิสเตอร์)"], a: 2 },
+            { t: "พื้นที่ ที่อยู่บนพื้นผิวแผงวงจรใช้สำหรับการบัดกรี หรือประกอบตัวอุปกรณ์ต่างๆ เรียกว่าอะไร", opts: ["Component (คอมโพเน้นท์)", "Solder Resist (โซลเดอร์ รีซีส)", "Terminal (เทอร์มินอล)", "Pad, Land (แพด, แลนด์)"], a: 3 },
+            { t: "จากรูปภาพ คืออุปกรณ์ชนิดใด?", img: "images/A.jpg", opts: ["Inductor (ชิบ อินดัคเตอร์)", "Resistor (รีซีสเตอร์)", "Capacitor (คาปาซิเตอร์)", "Diode (ซีเนอร์ ไดโอด)"], a: 0 },
+            { t: "จากรูปภาพ คืออุปกรณ์ชนิดใด?", img: "images/B.jpg", opts: ["Connector (คอนเนกเตอร์)", "Integrate Circuit (อินดิเกรทเซอร์กิต)", "Switch (สวิทซ์) ", "Transistor (ทรานซิสเตอร์)"], a: 1 },
+            { t: "จากรูปภาพ คืออุปกรณ์ชนิดใด?", img: "images/C.jpg", opts: ["LED (หลอดเอลอีดี)", "Zener Diode (ซีเนอร์ ไดโอด)", "Crystal (คริสตอล)", "Buzzer (บัชเซอร์)"], a: 1 },
+            { t: "จากรูปภาพ คืออุปกรณ์ชนิดใด?", img: "images/D.jpg", opts: ["Heatsink (ฮีท ซิงค์)", "Transformer (ทรานฟอเมอร์)", "Buzzer (บัชเซอร์)", "Switch (สวิทซ์)"], a: 2 },
+            { t: "จากรูปภาพ คืออุปกรณ์ชนิดใด?", img: "images/E.jpg", opts: ["Electrolytic Capacitor (อิเล็คโทรไลติกคาปาซิเตอร์)", "Ceramic Capacitor (เซรามิกคาปาซิเตอร์)", "Tantalum Capacitor (แทนทาลัม คาปาซิเตอร์)", "Resistor (รีซีสเตอร์)"], a: 0 },
+            { t: "จากรูปภาพ คืออุปกรณ์ชนิดใด?", img: "images/F.jpg", opts: ["Chip Resistor (ชิบ รีซีสเตอร์)", "Chip Capacitor (ชิบ คาปาซิเตอร์)", "Inductor (ชิบ อินดัคเตอร์)", "Diode (ซีเนอร์ ไดโอด)"], a: 0 },
+            { t: "จากรูปภาพ คืออุปกรณ์ชนิดใด?", img: "images/G.jpg", opts: ["Connector (คอนเนกเตอร์)", "Heat Sink (ฮีท ซิงค์)", "Transformer (ทรานฟอเมอร์)", "Crystal (คริสตอล)"], a: 1 },
+            { t: "จากรูปภาพ คืออุปกรณ์ชนิดใด?", img: "images/H.jpg", opts: ["Resistor (รีซีสเตอร์)", "Capacitor (คาปาซิเตอร์)", "Crystal (คริสตอล)", "LED (หลอดเอลอีดี)"], a: 2 },
+            { t: "จากรูปภาพ คืออุปกรณ์ชนิดใด?", img: "images/I.jpg", opts: ["Chip Capacitor (ชิบ คาปาซิเตอร์)", "Chip Resistor (ชิบ รีซีสเตอร์)", "Tantalum Capacitor (แทนทาลัม คาปาซิเตอร์)", "Inductor (ชิบ อินดัคเตอร์)"], a: 0 },
+            { t: "จากรูปภาพ คืออุปกรณ์ชนิดใด?", img: "images/J.jpg", opts: ["Switch (สวิทซ์)", "Transformer (ทรานฟอเมอร์)", "Buzzer (บัชเซอร์)", "Connector (คอนเนกเตอร์)"], a: 1 },
+            { t: "จากรูปภาพ คืออุปกรณ์ชนิดใด?", img: "images/K.jpg", opts: ["Electrolytic Capacitor", "Tantalum Capacitor (แทนทาลัม คาปาซิเตอร์)", "Ceramic Capacitor", "Resistor"], a: 1 },
+            { t: "จากรูปภาพ คืออุปกรณ์ชนิดใด?", img: "images/L.jpg", opts: ["Switch (สวิทซ์)", "Connector (คอนเนกเตอร์)", "Socket (ซ็อกเก็ต)", "Terminal (เทอร์มินอล)"], a: 0 },
+            { t: "จากรูปภาพ คืออุปกรณ์ชนิดใด?", img: "images/M.jpg", opts: ["Diode", "Transistor (ทรานซิสเตอร์)", "IC", "Regulator"], a: 1 },
+            { t: "จากรูปภาพ คืออุปกรณ์ชนิดใด?", img: "images/N.jpg", opts: ["Switch (สวิทซ์)", "Connector (คอนเนกเตอร์)", "Header (เฮดเดอร์)", "Pin (พิน)"], a: 1 },
+            { t: "จากรูปภาพ คืออุปกรณ์ชนิดใด?", img: "images/O.jpg", opts: ["Resistor (รีซีสเตอร์)", "Diode (ไดโอด)", "Inductor (ชิบ อินดัคเตอร์)", "Fuse (ฟิวส์)"], a: 0 },
+            { t: "จากรูปภาพ คืออุปกรณ์ชนิดใด?", img: "images/P.jpg", opts: ["light (ไลท์)", "Neon (นีออน)", "LED (หลอดเอลอีดี)", "Display (ดีสเพลย์)"], a: 2 },
+            { t: "จากรูปภาพ คืออุปกรณ์ชนิดใด?", img: "images/Q.jpg", opts: ["PCB (พีซีบี)", "Wafer (เวเฟอร์)", "Panel (พาเนล)", "Sheet (ซีส)"], a: 0 }
+        ];
+
+        let db, auth, currentStudent = null, studentCache = null, isFetching = false;
+        let configRef, studentsRef, studentQuestions = [], studentAnswersMap = {}, currentQIndex = 0;
+        let studentOptionOrders = {}, allResults = [];
+        let systemConfig = { isOpen: false, isShuffle: true, passPercentage: 60 };
+
+        function updateLog(msg) {
+            const el = document.getElementById('loading-log');
+            if (el) el.innerText = msg;
+        }
+
+        async function init() {
+            try {
+                updateLog("กำลังเชื่อมต่อฐานข้อมูล...");
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                configRef = doc(db, 'bec_config_v11', 'main'); 
+                studentsRef = collection(db, 'bec_students_v11');
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        updateLog("เชื่อมต่อสำเร็จ!");
+                        document.getElementById('loading-overlay').style.display = 'none';
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                });
+            } catch(e) { 
+                const diag = document.getElementById('diagnostic-box');
+                const diagTxt = document.getElementById('diagnostic-text');
+                if (diag) diag.classList.remove('hidden');
+                if (diagTxt) diagTxt.innerText = "Firebase Error: " + e.message;
+            }
+        }
+
+        const show = (id) => {
+            document.querySelectorAll('.page').forEach(el => el.style.display = 'none');
+            const el = document.getElementById(id);
+            if(id === 'page-student-exam' || id === 'page-home') el.style.display = 'flex';
+            else el.style.display = 'block';
+        };
+
+        // --- TEACHER SYSTEM ---
+        function initTeacherDashboard() {
+            // Setup Table Header
+            const thead = document.querySelector('thead #grid-header-row');
+            thead.innerHTML = `<th class="p-3 border-b w-12 text-center bg-slate-50 sticky left-0 z-20">#</th><th class="p-3 border-b w-24 text-center bg-slate-50 sticky left-12 z-20">รหัส</th><th class="p-3 border-b min-w-[200px] bg-slate-50 sticky left-[144px] z-20 border-r">ชื่อ-สกุล</th><th class="p-3 border-b w-20 text-center bg-slate-50">สถานะ</th><th class="p-3 border-b w-16 text-center bg-slate-50 font-bold">เวลา</th><th class="p-3 border-b w-20 text-center bg-slate-50 text-sky-700 font-bold">%</th>`;
+            MASTER_QUESTIONS.forEach((_, i) => {
+                const th = document.createElement('th');
+                th.className = "p-2 border-b text-center w-12 font-bold text-slate-400 text-xs";
+                th.innerText = i + 1; thead.appendChild(th);
+            });
+
+            // Monitor Config
+            onSnapshot(configRef, (snap) => {
+                if (snap.exists()) {
+                    systemConfig = snap.data();
+                    const isOpen = systemConfig.isOpen || false;
+                    const isShuffle = (systemConfig.isShuffle !== undefined) ? systemConfig.isShuffle : true;
+                    const passMark = systemConfig.passPercentage || 60;
+
+                    const btnSys = document.getElementById('btn-toggle-system');
+                    btnSys.innerHTML = isOpen ? `<i class="fa-solid fa-pause"></i> ปิดรับคำตอบ` : `<i class="fa-solid fa-play"></i> เปิดรับคำตอบ`;
+                    btnSys.className = isOpen ? "px-4 py-2 rounded-lg text-white font-bold bg-amber-500 text-sm shadow-md" : "px-4 py-2 rounded-lg text-white font-bold bg-emerald-500 text-sm shadow-md";
+                    document.getElementById('txt-system-status').innerText = isOpen ? 'ระบบเปิดอยู่' : 'ระบบปิดอยู่';
+
+                    const btnShuf = document.getElementById('btn-toggle-shuffle');
+                    btnShuf.innerHTML = isShuffle ? `<i class="fa-solid fa-shuffle"></i> สุ่มข้อสอบ` : `<i class="fa-solid fa-list-ol"></i> เรียงตามข้อ`;
+                    btnShuf.className = isShuffle ? "px-4 py-2 rounded-lg text-white font-bold bg-indigo-500 text-sm shadow-md" : "px-4 py-2 rounded-lg text-white font-bold bg-slate-500 text-sm shadow-md";
+
+                    document.getElementById('select-pass-mark').value = passMark;
+                }
+            });
+
+            // Monitor Data
+            onSnapshot(query(studentsRef), (snap) => {
+                allResults = []; 
+                snap.forEach(d => allResults.push(d.data()));
+                renderGrid();
+            });
+
+            document.getElementById('btn-toggle-system').onclick = async () => await setDoc(configRef, { ...systemConfig, isOpen: !systemConfig.isOpen }, { merge: true });
+            document.getElementById('btn-toggle-shuffle').onclick = async () => await setDoc(configRef, { ...systemConfig, isShuffle: !systemConfig.isShuffle }, { merge: true });
+            document.getElementById('select-pass-mark').onchange = async (e) => await setDoc(configRef, { ...systemConfig, passPercentage: parseInt(e.target.value) }, { merge: true });
+            
+            document.getElementById('toggle-answers').onchange = () => renderGrid();
+            document.getElementById('toggle-names').onchange = () => renderGrid();
+            
+            // Clear DB Action
+            document.getElementById('btn-clear-db').onclick = async () => {
+                if (!confirm("⚠️ คำเตือน: คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลผู้เข้าสอบทั้งหมด? การกระทำนี้ไม่สามารถย้อนกลับได้")) return;
+                const snap = await getDocs(studentsRef);
+                const batch = writeBatch(db);
+                snap.forEach(d => batch.delete(d.ref));
+                await batch.commit();
+                alert("ล้างข้อมูลเรียบร้อย");
+            };
+        }
+
+        function renderGrid() {
+            const showNames = document.getElementById('toggle-names').checked;
+            const showAnswers = document.getElementById('toggle-answers').checked;
+            const tbody = document.getElementById('grid-body'); 
+            tbody.innerHTML = '';
+            document.getElementById('student-count').innerText = allResults.length;
+            
+            // SORTING: Highest Score First, then Lowest Time Taken
+            allResults.sort((a,b) => {
+                const scoreA = a.score || 0;
+                const scoreB = b.score || 0;
+                if (scoreB !== scoreA) return scoreB - scoreA;
+                return (a.timeTaken || 999999) - (b.timeTaken || 999999);
+            });
+            
+            allResults.forEach((s, i) => {
+                const tr = document.createElement('tr'); 
+                tr.className = "hover:bg-slate-50 border-b group";
+                
+                const timeStr = s.timeTaken ? (s.timeTaken < 60 ? `${s.timeTaken.toFixed(0)} ว.` : `${(s.timeTaken/60).toFixed(1)} น.`) : '-';
+                const isPassed = (s.score !== null && s.score >= (systemConfig.passPercentage || 60));
+                
+                let html = `
+                    <td class="p-3 text-center text-slate-400 text-xs sticky left-0 bg-white group-hover:bg-slate-50 z-10">${i+1}</td>
+                    <td class="p-3 text-center text-slate-600 font-mono text-xs sticky left-12 bg-white group-hover:bg-slate-50 z-10">${s.studentId}</td>
+                    <td class="p-3 whitespace-nowrap sticky left-[144px] bg-white group-hover:bg-slate-50 z-10 border-r">
+                        <div class="text-slate-700 font-medium text-sm">${showNames ? s.name : '*** (ซ่อนชื่อ)'}</div>
+                        <div class="text-[10px] text-slate-400">${s.dept || '-'}</div>
+                    </td>
+                    <td class="p-3 text-center">
+                        ${s.status === 'submitted' ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${isPassed ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">ส่งแล้ว</span>` : '<span class="bg-sky-100 text-sky-700 px-2 py-0.5 rounded text-[10px] font-bold">กำลังทำ</span>'}
+                    </td>
+                    <td class="p-3 text-center text-xs text-slate-500 font-mono">${timeStr}</td>
+                    <td class="p-3 text-center font-bold text-sm ${isPassed ? 'text-green-600' : 'text-slate-700'}">
+                        ${s.score !== null ? Math.round(s.score)+'%' : '-'}
+                    </td>
+                `;
+
+                s.answers.forEach((ansIdx, idx) => {
+                    let cellCls = "w-6 h-6 rounded mx-auto flex items-center justify-center text-[10px] font-bold ";
+                    let txt = (ansIdx === null) ? "•" : "";
+                    if (ansIdx !== null) { 
+                        if(showAnswers) { 
+                            const isC = (ansIdx === MASTER_QUESTIONS[idx].a); 
+                            cellCls += isC ? "bg-emerald-500 text-white" : "bg-red-500 text-white"; 
+                            txt = isC ? "✓" : "✕"; 
+                        } else { cellCls += "bg-sky-500 text-white"; txt = "A"; }
+                    } else cellCls += "bg-slate-100 text-slate-300";
+                    html += `<td class="p-1"><div class="${cellCls}">${txt}</div></td>`;
+                });
+                tr.innerHTML = html;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- STUDENT SYSTEM ---
+        async function fetchStudents() { 
+            if (studentCache) return studentCache;
+            if (isFetching) return [];
+            isFetching = true;
+            try {
+                const res = await fetch(SHEET_URL + "&t=" + Date.now()); 
+                if (!res.ok) throw new Error("Connection Error");
+                const csv = await res.text(); 
+                return new Promise((resolve) => {
+                    Papa.parse(csv, {
+                        header: true, skipEmptyLines: true, 
+                        complete: (results) => {
+                            const normalized = results.data.map(row => {
+                                const newRow = {};
+                                Object.keys(row).forEach(key => { newRow[key.trim().replace(/\s+/g, '')] = row[key]; });
+                                return newRow;
+                            });
+                            studentCache = normalized;
+                            isFetching = false;
+                            resolve(normalized);
+                        }
+                    });
+                });
+            } catch (err) {
+                isFetching = false;
+                return [];
+            }
+        }
+
+        document.getElementById('student-id').addEventListener('input', async (e) => { 
+            const id = e.target.value.trim(); 
+            if (id.length < 3) { document.getElementById('student-preview').classList.add('hidden'); return; }
+            const list = await fetchStudents(); 
+            const s = list.find(x => (x['รหัสประจำตัว'] || x['รหัส'] || x['EmployeeID']) == id); 
+            if (s) { 
+                document.getElementById('preview-name').innerText = (s['ชื่อ'] || "") + " " + (s['นามสกุล'] || ""); 
+                document.getElementById('preview-dept').innerText = s['แผนก'] || ""; 
+                document.getElementById('student-preview').classList.remove('hidden'); 
+            } else { document.getElementById('student-preview').classList.add('hidden'); }
+        });
+
+        document.getElementById('btn-student-login').onclick = async () => {
+            const id = document.getElementById('student-id').value.trim();
+            if (!id) return alert("กรุณากรอกรหัสพนักงาน");
+            
+            const confSnap = await getDoc(configRef);
+            if (!confSnap.exists() || !confSnap.data().isOpen) return alert("❌ ขณะนี้ระบบปิดรับคำตอบ");
+            systemConfig = confSnap.data();
+
+            const list = await fetchStudents(); 
+            const s = list.find(x => (x['รหัสประจำตัว'] || x['รหัส'] || x['EmployeeID']) == id); 
+            if (!s) return alert("❌ ไม่พบข้อมูลพนักงานรหัสนี้");
+
+            currentStudent = { 
+                id: (s['รหัสประจำตัว'] || s['รหัส'] || s['EmployeeID']), 
+                name: (s['ชื่อ'] || "") + " " + (s['นามสกุล'] || ""), 
+                dept: s['แผนก'] || "", startTime: Date.now() 
+            };
+            
+            const existing = await getDoc(doc(studentsRef, currentStudent.id));
+            if (existing.exists() && existing.data().status === 'submitted') return alert("⚠️ คุณได้ส่งคำตอบไปแล้ว");
+            
+            if (!existing.exists()) { 
+                await setDoc(doc(studentsRef, currentStudent.id), { 
+                    studentId: currentStudent.id, name: currentStudent.name, dept: currentStudent.dept, 
+                    status: 'online', score: null, answers: new Array(40).fill(null), startTime: Date.now()
+                }); 
+            } else {
+                const data = existing.data();
+                if (data.answers) data.answers.forEach((v, idx) => { if(v !== null) studentAnswersMap[idx] = v; });
+                if (data.startTime) currentStudent.startTime = data.startTime;
+            }
+
+            // Logic Shuffle based on Teacher Config
+            if (systemConfig.isShuffle !== false) {
+                studentQuestions = MASTER_QUESTIONS.map((q, i) => ({...q, originalIndex: i})).sort(() => Math.random() - 0.5);
+            } else {
+                studentQuestions = MASTER_QUESTIONS.map((q, i) => ({...q, originalIndex: i}));
+            }
+            
+            studentOptionOrders = {}; 
+            studentQuestions.forEach(q => studentOptionOrders[q.originalIndex] = [0,1,2,3].sort(() => Math.random() - 0.5));
+            
+            document.getElementById('exam-student-name').innerText = currentStudent.name;
+            document.getElementById('exam-student-dept').innerText = currentStudent.dept;
+            renderQuestion();
+            show('page-student-exam');
+        };
+
+        function renderQuestion() {
+            const q = studentQuestions[currentQIndex];
+            document.getElementById('q-current').innerText = currentQIndex + 1;
+            document.getElementById('question-text').innerText = q.t;
+            document.getElementById('progress-bar').style.width = `${((currentQIndex + 1) / 40) * 100}%`;
+            
+            const imgC = document.getElementById('question-image-container');
+            if (q.img) { imgC.classList.remove('hidden'); document.getElementById('question-image').src = q.img; } else imgC.classList.add('hidden');
+            
+            const optsC = document.getElementById('options-container');
+            optsC.innerHTML = '';
+            studentOptionOrders[q.originalIndex].forEach((origIdx, i) => {
+                const isS = studentAnswersMap[q.originalIndex] === origIdx;
+                optsC.innerHTML += `
+                    <div onclick="window.selectAnswer(${origIdx})" class="p-4 border-2 rounded-xl cursor-pointer flex items-center gap-4 ${isS ? 'border-sky-500 bg-sky-50' : 'border-slate-100 hover:bg-slate-50'}">
+                        <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold ${isS ? 'bg-sky-500 border-sky-500 text-white' : 'text-slate-400'}">${String.fromCharCode(65+i)}</div>
+                        <span class="text-lg font-medium text-slate-700">${q.opts[origIdx]}</span>
+                    </div>`;
+            });
+            document.getElementById('btn-prev').disabled = (currentQIndex === 0);
+            document.getElementById('btn-next').classList.toggle('hidden', currentQIndex === 39);
+            document.getElementById('btn-submit').classList.toggle('hidden', currentQIndex !== 39);
+        }
+
+        window.selectAnswer = async (val) => {
+            const q = studentQuestions[currentQIndex];
+            studentAnswersMap[q.originalIndex] = val;
+            renderQuestion();
+            const arr = new Array(40).fill(null);
+            Object.keys(studentAnswersMap).forEach(k => arr[k] = studentAnswersMap[k]);
+            await updateDoc(doc(studentsRef, currentStudent.id), { answers: arr });
+        };
+
+        document.getElementById('btn-next').onclick = () => {
+            if (studentAnswersMap[studentQuestions[currentQIndex].originalIndex] === undefined) return alert("กรุณาเลือกคำตอบก่อน");
+            currentQIndex++; renderQuestion();
+        };
+
+        document.getElementById('btn-prev').onclick = () => { if (currentQIndex > 0) { currentQIndex--; renderQuestion(); }};
+
+        document.getElementById('btn-submit').onclick = async () => {
+            if (!confirm("ยืนยันส่งคำตอบ?")) return;
+            let correct = 0;
+            MASTER_QUESTIONS.forEach((q, i) => { if(studentAnswersMap[i] === q.a) correct++; });
+            const finalScore = (correct / 40) * 100;
+            const timeTaken = (Date.now() - currentStudent.startTime) / 1000;
+            
+            await updateDoc(doc(studentsRef, currentStudent.id), { 
+                status: 'submitted', score: finalScore, timeTaken: timeTaken
+            });
+
+            // Pass/Fail Logic
+            const passMark = systemConfig.passPercentage || 60;
+            const badge = document.getElementById('pass-fail-badge');
+            if (finalScore >= passMark) {
+                badge.innerText = `ผ่านเกณฑ์ (${finalScore}%)`;
+                badge.className = "inline-block px-6 py-2 rounded-full font-black text-xl mb-6 shadow-sm bg-green-500 text-white animate-bounce";
+            } else {
+                badge.innerText = `ไม่ผ่านเกณฑ์ (${finalScore}%)`;
+                badge.className = "inline-block px-6 py-2 rounded-full font-black text-xl mb-6 shadow-sm bg-red-500 text-white";
+            }
+            show('page-submitted');
+        };
+
+        document.getElementById('btn-dl-excel').onclick = () => {
+            const data = allResults.map((s, i) => {
+                const row = { "ลำดับ": i+1, "รหัส": s.studentId, "ชื่อ": s.name, "แผนก": s.dept, "เวลาที่ใช้(วินาที)": s.timeTaken ? s.timeTaken.toFixed(0) : '-', "คะแนน(%)": s.score };
+                s.answers.forEach((ans, idx) => { row[`ข้อ ${idx+1}`] = (ans === MASTER_QUESTIONS[idx].a) ? "ถูก" : (ans === null ? "ไม่ตอบ" : "ผิด"); });
+                return row;
+            });
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Results");
+            XLSX.writeFile(wb, "Exam_Results_2026.xlsx");
+        };
+
+        document.getElementById('btn-teacher-login').onclick = () => {
+            if(document.getElementById('teacher-room-code').value === TEACHER_CODE) {
+                show('page-teacher-dashboard'); initTeacherDashboard();
+            } else alert("รหัสผ่านไม่ถูกต้อง");
+        };
+
+        document.getElementById('btn-go-teacher').onclick = () => show('page-teacher-login');
+        document.getElementById('btn-go-student').onclick = () => show('page-student-login');
 
         init();
     </script>
